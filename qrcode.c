@@ -66,8 +66,8 @@ static int is_forbidden(scanner_t* scanner, size_t i, size_t j)
 	if (j == 6) return 1;
 
 	// alignments
-	if (i <= 8) return 0;
-	if (j <= 8) return 0;
+	if (i <= 8 && j >= s-10) return 0;
+	if (j <= 8 && i >= s-10) return 0;
 	static const size_t aligns[][8] =
 	{
 		{ 0, },
