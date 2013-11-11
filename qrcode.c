@@ -253,11 +253,11 @@ void qrc_decode(bitmap_t* img)
 	{
 		byte enc = read_bits(scanner, 4);
 
-		if (enc == 0)
+		if (enc == 0) // END
 		{
 			break;
 		}
-		else if (enc == 1)
+		else if (enc == 1) // numeric
 		{
 			size_t len = read_bits(scanner, 10);
 			for (; len>=3; len-=3)
@@ -270,16 +270,32 @@ void qrc_decode(bitmap_t* img)
 			if (len == 2)
 			{
 				unsigned int c = read_bits(scanner, 7);
-				printf("%u", (c/ 10) % 10);
-				printf("%u", (c/  1) % 10);
+				printf("%u", c/10);
+				printf("%u", c%10);
 			}
 			else if (len == 1)
 			{
 				unsigned int c = read_bits(scanner, 4);
-				printf("%u", (c/  1) % 10);
+				printf("%u", c);
 			}
 		}
-		else if (enc == 4)
+		else if (enc == 2) // alphanumeric
+		{
+			static const char* map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%%*+-./:";
+			size_t len = read_bits(scanner, 9);
+			for (; len >= 2; len-=2)
+			{
+				unsigned int c = read_bits(scanner, 11);
+				printf("%c", map[c/45]);
+				printf("%c", map[c%45]);
+			}
+			if (len == 1)
+			{
+				unsigned int c = read_bits(scanner, 6);
+				printf("%c", map[c]);
+			}
+		}
+		else if (enc == 4) // Shift JIS
 		{
 			size_t len = read_bits(scanner, 8);
 			for (size_t i = 0; i < len; i++)
