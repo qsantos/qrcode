@@ -118,19 +118,19 @@ static byte read_bit(scanner_t* scanner)
 
 	// mask
 	byte res = P(i,j);
-	if (scanner->m == 4)
-		res ^= 0 == (i/2+j/3)%2;         // 100
-
-/*
-		res ^= 0 == (i+j)%2;             // 000
-		res ^= 0 == i%2;                 // 001
-		res ^= 0 == j%3;                 // 010
-		res ^= 0 == (i+j)%3;             // 011
-		res ^= 0 == (i/2+j/3)%2;         // 100
-		res ^= 0 == (i*j)%2 + (i*j)%3;   // 101
-		res ^= 0 == ((i*j)%2+(i*j)%3)%2; // 110
-		res ^= 0 == ((i*j)%3+(i+j)%2)%2; // 111
-*/
+	switch (scanner->m)
+	{
+	case 0: res ^= 0 == (i*j)%2 + (i*j)%3;   break;
+	case 1: res ^= 0 == (i/2+j/3)%2;         break;
+	case 2: res ^= 0 == ((i*j)%3+(i+j)%2)%2; break;
+	case 3: res ^= 0 == ((i*j)%2+(i*j)%3)%2; break;
+	case 4: res ^= 0 == i%2;                 break;
+	case 5: res ^= 0 == (i+j)%2;             break;
+	case 6: res ^= 0 == (i+j)%3;             break;
+	case 7: res ^= 0 == j%3;                 break;
+	default:
+		exit(1);
+	}
 
 	// next bit
 	do
@@ -238,13 +238,7 @@ void qrc_decode(bitmap_t* img)
 	scanner->v = v;
 
 	// mask
-	int m = P(s-3,8) + P(s-4,8)*2 + P(s-5,8)*4;
-	if (m != 4)
-	{
-		fprintf(stderr, "Unsupported mask '%i'\n", m);
-		exit(1);
-	}
-	scanner->m = 4;
+	scanner->m = 4*P(s-3,8) + 2*P(s-4,8) + P(s-5,8);
 
 	// error correction level
 	// int c = (!P(s-1,8))*2 + (!P(s-2,8));
