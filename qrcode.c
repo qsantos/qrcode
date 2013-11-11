@@ -267,7 +267,7 @@ void qrc_decode(bitmap_t* img)
 		exit(1);
 	}
 	v /= 4;
-	if (!(1 <= v && v <= 9))
+	if (!(1 <= v && v <= 40))
 	{
 		fprintf(stderr, "Unsupported version '%zu'\n", v);
 		exit(1);
@@ -316,7 +316,11 @@ void qrc_decode(bitmap_t* img)
 		}
 		else if (enc == 1) // numeric
 		{
-			size_t len = read_bits(scanner, 10);
+			size_t lenbits = 10;
+			if (v >= 27) lenbits = 14;
+			else if (v >= 10) lenbits = 12;
+			size_t len = read_bits(scanner, lenbits);
+
 			for (; len>=3; len-=3)
 			{
 				unsigned int c = read_bits(scanner, 10);
@@ -338,8 +342,12 @@ void qrc_decode(bitmap_t* img)
 		}
 		else if (enc == 2) // alphanumeric
 		{
+			size_t lenbits = 9;
+			if (v >= 27) lenbits = 11;
+			else if (v >= 10) lenbits = 13;
+			size_t len = read_bits(scanner, lenbits);
+
 			static const char* map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%%*+-./:";
-			size_t len = read_bits(scanner, 9);
 			for (; len >= 2; len-=2)
 			{
 				unsigned int c = read_bits(scanner, 11);
@@ -354,7 +362,10 @@ void qrc_decode(bitmap_t* img)
 		}
 		else if (enc == 4) // Shift JIS
 		{
-			size_t len = read_bits(scanner, 8);
+			size_t lenbits = 9;
+			if (v >= 10) lenbits = 16;
+			size_t len = read_bits(scanner, lenbits);
+
 			for (size_t i = 0; i < len; i++)
 			{
 				byte c = read_bits(scanner, 8);
