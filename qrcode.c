@@ -254,16 +254,22 @@ void qrc_decode(bitmap_t* img)
 		else if (enc == 1)
 		{
 			size_t len = read_bits(scanner, 10);
-			if (len % 3 != 0)
-			{
-				fprintf(stderr, "Unexpected numeric length '%zu'\n", len);
-				exit(1);
-			}
-			for (size_t i = 0; i < len/3; i++)
+			for (; len>=3; len-=3)
 			{
 				unsigned int c = read_bits(scanner, 10);
 				printf("%u", (c/100) % 10);
 				printf("%u", (c/ 10) % 10);
+				printf("%u", (c/  1) % 10);
+			}
+			if (len == 2)
+			{
+				unsigned int c = read_bits(scanner, 7);
+				printf("%u", (c/ 10) % 10);
+				printf("%u", (c/  1) % 10);
+			}
+			else if (len == 1)
+			{
+				unsigned int c = read_bits(scanner, 4);
 				printf("%u", (c/  1) % 10);
 			}
 		}
