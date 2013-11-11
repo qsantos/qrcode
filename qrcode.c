@@ -52,10 +52,14 @@ static int is_forbidden(scanner_t* scanner, size_t i, size_t j)
 {
 	size_t s = scanner->s;
 
-	// finders
-	if (i <= 8   && j <= 8) return 1;
-	if (i <= 8 && j >= s-8) return 1;
-	if (i >= s-8 && j <= 8) return 1;
+	// finders and format information
+	if (i <= 8   && j <= 8) return 1; // top-left
+	if (i <= 8 && j >= s-8) return 1; // top-right
+	if (j <= 8 && i >= s-8) return 1; // bottom-left
+
+	// version information
+	if (i < 6 && j >= s-11) return 1; // top-right
+	if (j < 6 && i >= s-11) return 1; // bottom-left
 
 	// timings
 	if (i == 6) return 1;
