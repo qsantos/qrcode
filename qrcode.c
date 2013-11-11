@@ -10,14 +10,15 @@ struct scanner
 	int      v; // version
 	color_t* d; // data
 	int      m; // mask
+	int      b; // number of correction blocks
 
 	// current bit
 	size_t   i;
 	size_t   j;
 
 	// codeword buffer
-	byte     b;
-	size_t   b_avail;
+	byte     buf;
+	size_t   buf_avail;
 };
 
 #define P(I,J) (scanner->d[(I)*scanner->s + (J)].r != 0 ? 1 : 0)
@@ -178,11 +179,14 @@ static byte read_bit(scanner_t* scanner)
 static byte read_codeword(scanner_t* scanner)
 {
 	byte res = 0;
-	for (size_t k = 0; k < 8; k++)
+	for (size_t i = 0; i < 8; i++)
 	{
 		res *= 2;
 		res += read_bit(scanner);
 	}
+	for (int i = 1; i < scanner->b; i++)
+		for (size_t j = 0; j < 8; j++)
+			read_bit(scanner);
 	return res;
 }
 static unsigned int read_bits(scanner_t* scanner, size_t n)
@@ -190,13 +194,13 @@ static unsigned int read_bits(scanner_t* scanner, size_t n)
 	unsigned int res = 0;
 	while (n)
 	{
-		if (!scanner->b_avail)
+		if (!scanner->buf_avail)
 		{
-			scanner->b = read_codeword(scanner);
-			scanner->b_avail = 8;
+			scanner->buf = read_codeword(scanner);
+			scanner->buf_avail = 8;
 		}
-		res = res*2 + ((scanner->b >> (scanner->b_avail-1))& 1);
-		scanner->b_avail--;
+		res = res*2 + ((scanner->buf >> (scanner->buf_avail-1))& 1);
+		scanner->buf_avail--;
 		n--;
 	}
 	return res;
@@ -235,19 +239,22 @@ void qrc_decode(bitmap_t* img)
 		fprintf(stderr, "Unsupported version '%zu'\n", v);
 		exit(1);
 	}
+	printf("Version %zu\n", v);
 	scanner->v = v;
 
 	// mask
 	scanner->m = 4*P(s-3,8) + 2*P(s-4,8) + P(s-5,8);
 
 	// error correction level
-	// int c = (!P(s-1,8))*2 + (!P(s-2,8));
+	// int c = (!P(s-1,8))*2 + (!P(s-2,8)); // TODO
+
+	scanner->b = v < 6 ? 1 : 2; // TODO
 
 	// initialize reading
 	scanner->i = s-1;
 	scanner->j = s-1;
-	scanner->b = 0;
-	scanner->b_avail = 0;
+	scanner->buf = 0;
+	scanner->buf_avail = 0;
 
 	while (1)
 	{
@@ -263,6 +270,7 @@ void qrc_decode(bitmap_t* img)
 			for (; len>=3; len-=3)
 			{
 				unsigned int c = read_bits(scanner, 10);
+				(void) c;
 				printf("%u", (c/100) % 10);
 				printf("%u", (c/ 10) % 10);
 				printf("%u", (c/  1) % 10);
@@ -270,12 +278,14 @@ void qrc_decode(bitmap_t* img)
 			if (len == 2)
 			{
 				unsigned int c = read_bits(scanner, 7);
+				(void) c;
 				printf("%u", c/10);
 				printf("%u", c%10);
 			}
 			else if (len == 1)
 			{
 				unsigned int c = read_bits(scanner, 4);
+				(void) c;
 				printf("%u", c);
 			}
 		}
@@ -286,12 +296,14 @@ void qrc_decode(bitmap_t* img)
 			for (; len >= 2; len-=2)
 			{
 				unsigned int c = read_bits(scanner, 11);
+				(void) c;
 				printf("%c", map[c/45]);
 				printf("%c", map[c%45]);
 			}
 			if (len == 1)
 			{
 				unsigned int c = read_bits(scanner, 6);
+				(void) c;
 				printf("%c", map[c]);
 			}
 		}
@@ -301,6 +313,7 @@ void qrc_decode(bitmap_t* img)
 			for (size_t i = 0; i < len; i++)
 			{
 				byte c = read_bits(scanner, 8);
+				(void) c;
 				printf("%c", c);
 			}
 		}
@@ -310,5 +323,5 @@ void qrc_decode(bitmap_t* img)
 			exit(1);
 		}
 	}
-	printf("\n");
+	//printf("\n");
 }
