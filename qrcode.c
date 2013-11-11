@@ -116,9 +116,21 @@ static byte read_bit(scanner_t* scanner)
 	size_t i = scanner->i;
 	size_t j = scanner->j;
 
+	// mask
 	byte res = P(i,j);
 	if (scanner->m == 4)
-		res ^= (  (i/2 + j/3)%2 == 0  );
+		res ^= 0 == (i/2+j/3)%2;         // 100
+
+/*
+		res ^= 0 == (i+j)%2;             // 000
+		res ^= 0 == i%2;                 // 001
+		res ^= 0 == j%3;                 // 010
+		res ^= 0 == (i+j)%3;             // 011
+		res ^= 0 == (i/2+j/3)%2;         // 100
+		res ^= 0 == (i*j)%2 + (i*j)%3;   // 101
+		res ^= 0 == ((i*j)%2+(i*j)%3)%2; // 110
+		res ^= 0 == ((i*j)%3+(i+j)%2)%2; // 111
+*/
 
 	// next bit
 	do
