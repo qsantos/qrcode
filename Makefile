@@ -15,4 +15,4 @@ clean:
 destroy: clean
 	rm -f $(TARGETS)
 
-rebuild: destroy all
+rebuild: destroy $(TARGETS)
