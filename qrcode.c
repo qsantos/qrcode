@@ -230,7 +230,7 @@ void qrc_decode(bitmap_t* img)
 		exit(1);
 	}
 	v /= 4;
-	if (v != 4)
+	if (!(1 <= v && v <= 9))
 	{
 		fprintf(stderr, "Unsupported version '%zu'\n", v);
 		exit(1);
