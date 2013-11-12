@@ -205,7 +205,7 @@ static byte read_codeword(scanner_t* scanner)
 		size_t i = 0;
 		scanner->cur_block++;
 		int n = scanner->cur_block - b[0];
-		while (n > 0)
+		while (n >= 0)
 		{
 			i += 3;
 			n -= b[i];
