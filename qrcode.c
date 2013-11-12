@@ -48,7 +48,7 @@ static void check_finder(scanner_t* scanner, size_t i, size_t j)
 			exit(1);
 		}
 }
-static int is_forbidden(scanner_t* scanner, size_t i, size_t j)
+static int is_data(scanner_t* scanner, size_t i, size_t j)
 {
 	size_t s = scanner->s;
 
@@ -178,7 +178,7 @@ static byte read_bit(scanner_t* scanner)
 			}
 		}
 	}
-	while (is_forbidden(scanner,i,j));
+	while (is_data(scanner,i,j));
 
 	scanner->i = i;
 	scanner->j = j;
