@@ -289,12 +289,7 @@ void qrc_decode(bitmap_t* img)
 	scanner->m = 4*P(s-3,8) + 2*P(s-4,8) + P(s-5,8);
 
 	// error correction level
-	int c = (!P(s-1,8))*2 + (!P(s-2,8)); // TODO
-	if (c != 0)
-	{
-		fprintf(stderr, "Unsupported error correction level '%i'\n", c);
-		exit(1);
-	}
+	int c = (!P(s-1,8))*2 + (!P(s-2,8));
 
 	static const int blocks[160][7] =
 	{
