@@ -283,8 +283,12 @@ void qrc_decode(bitmap_t* img)
 	scanner->m = 4*P(s-3,8) + 2*P(s-4,8) + P(s-5,8);
 
 	// error correction level
-	// int c = (!P(s-1,8))*2 + (!P(s-2,8)); // TODO
-	int c = 0;
+	int c = (!P(s-1,8))*2 + (!P(s-2,8)); // TODO
+	if (c != 0)
+	{
+		fprintf(stderr, "Unsupported error correction level '%i'\n", c);
+		exit(1);
+	}
 
 	static const int blocks[160][7] =
 	{
@@ -347,8 +351,8 @@ void qrc_decode(bitmap_t* img)
 		else if (enc == 2) // alphanumeric
 		{
 			size_t lenbits = 9;
-			if (v >= 27) lenbits = 11;
-			else if (v >= 10) lenbits = 13;
+			if (v >= 27) lenbits = 13;
+			else if (v >= 10) lenbits = 11;
 			size_t len = read_bits(scanner, lenbits);
 
 			static const char* map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%%*+-./:";
@@ -366,7 +370,7 @@ void qrc_decode(bitmap_t* img)
 		}
 		else if (enc == 4) // Shift JIS
 		{
-			size_t lenbits = 9;
+			size_t lenbits = 8;
 			if (v >= 10) lenbits = 16;
 			size_t len = read_bits(scanner, lenbits);
 
