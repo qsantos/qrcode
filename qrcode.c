@@ -218,12 +218,19 @@ static byte read_codeword(scanner_t* scanner)
 		// set info
 		scanner->cur_words = b[i+2];
 		scanner->cur_word = 0;
-	}
 
+		// skip the previous blocks
+		for (int i = 0; i < scanner->cur_block; i++)
+			for (size_t j = 0; j < 8; j++)
+				read_bit(scanner);
+	}
 	// otherwise, skip the interleaved blocks
-	for (int i = 1; i < scanner->n_blocks; i++)
-		for (size_t j = 0; j < 8; j++)
-			read_bit(scanner);
+	else
+	{
+		for (int i = 1; i < scanner->n_blocks; i++)
+			for (size_t j = 0; j < 8; j++)
+				read_bit(scanner);
+	}
 	return res;
 }
 static unsigned int read_bits(scanner_t* scanner, size_t n)
