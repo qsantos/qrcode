@@ -113,9 +113,8 @@ static int is_forbidden(scanner_t* scanner, size_t i, size_t j)
 		{ 6,30,58,86,114,142,170,0 },
 	};
 	int coll_x = 0;
-	size_t r = s-1-i; // row
 	for (const size_t* a = aligns[scanner->v]; *a && !coll_x; a++)
-		coll_x = (*a-2 <= r && r <= *a+2);
+		coll_x = (*a-2 <= i && i <= *a+2);
 	int coll_y = 0;
 	for (const size_t* a = aligns[scanner->v]; *a && !coll_y; a++)
 		coll_y = (*a-2 <= j && j <= *a+2);
