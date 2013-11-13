@@ -87,7 +87,7 @@ void load_pbm(scanner_t* scanner, FILE* f)
 		for (size_t i = 0; i < h; i++)
 		{
 			for (size_t j = 0; j < w; j++)
-				P(i, j) = nextbit(f, &buf, &buf_avail) ? 255 : 0;
+				P(i, j) = nextbit(f, &buf, &buf_avail);
 			buf_avail = 0;
 		}
 	}
