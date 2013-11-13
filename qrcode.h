@@ -3,6 +3,6 @@
 
 #include "pbm.h"
 
-void qrc_decode(bitmap_t* img);
+void qrc_decode(scanner_t* scanner);
 
 #endif

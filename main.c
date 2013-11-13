@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "pbm.h"
 #include "qrcode.h"
 
@@ -10,11 +12,11 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	bitmap_t img;
-	pbm_file_to_bitmap(&img, f);
+	scanner_t scanner;
+	load_pbm(&scanner, f);
 
-	qrc_decode(&img);
+	qrc_decode(&scanner);
 
-	pbm_del(&img);
+	free(scanner.d);
 	return 0;
 }

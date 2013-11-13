@@ -1,18 +1,19 @@
 #ifndef QRSCANNER_H
 #define QRSCANNER_H
 
+#include <sys/types.h>
+typedef unsigned char bit;
+typedef unsigned char byte;
 typedef struct scanner scanner_t;
 
-#include "pbm.h"
-
-#define P(I,J) (scanner->d[(I)*scanner->s + (J)].r)
+#define P(I,J) (scanner->d[(I)*scanner->s + (J)])
 
 struct scanner
 {
-	size_t   s; // size
-	int      v; // version
-	color_t* d; // data
-	int      m; // mask
+	size_t s; // size
+	int    v; // version
+	bit*   d; // data
+	int    m; // mask
 
 	// block splitting
 	const int* blocks; // block information

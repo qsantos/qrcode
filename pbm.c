@@ -3,17 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void pbm_name_to_bitmap(bitmap_t* img, const char* name)
-{
-	FILE* f = fopen(name, "rb");
-	if (!f)
-	{
-		fprintf(stderr, "Could not open file '%s'\n", name);
-		exit(1);
-	}
-	pbm_file_to_bitmap(img, f);
-	fclose(f);
-}
+static byte nextint(FILE* f);
+static byte nextbit(FILE* f, byte* buf, size_t* buf_avail);
 
 static byte nextint(FILE* f)
 {
@@ -59,7 +50,7 @@ static byte nextbit(FILE* f, byte* buf, size_t* buf_avail)
 	}
 	return (*buf >> (--(*buf_avail))) & 1;
 }
-void pbm_file_to_bitmap(bitmap_t* img, FILE* f)
+void load_pbm(scanner_t* scanner, FILE* f)
 {
 	fgetc(f); // reads 'P'
 	char format = fgetc(f); // reads format (1-6)
@@ -67,27 +58,27 @@ void pbm_file_to_bitmap(bitmap_t* img, FILE* f)
 	byte w = nextint(f);
 	byte h = nextint(f);
 
-	color_t* d = (color_t*) malloc(sizeof(color_t) * w*h);
+	if (w != h)
+	{
+		fprintf(stderr, "I only handle square images\n");
+		exit(1);
+	}
+
+	bit* d = (bit*) malloc(sizeof(bit) * w*h);
 	if (!d)
 	{
 		fprintf(stderr, "Could not allocate memory\n");
 		exit(1);
 	}
 
-	img->width  = w;
-	img->height = h;
-	img->data   = d;
+	scanner->d = d;
+	scanner->s = w;
 
 	if (format == '1')
 	{
 		for (size_t i = 0; i < h; i++)
 		for (size_t j = 0; j < w; j++)
-		{
-			byte v = nextint(f) ? 255 : 0;
-			PIX(img, i, j).r = v;
-			PIX(img, i, j).g = v;
-			PIX(img, i, j).b = v;
-		}
+			P(i, j) = nextint(f);
 	}
 	else if (format == '4')
 	{
@@ -96,12 +87,7 @@ void pbm_file_to_bitmap(bitmap_t* img, FILE* f)
 		for (size_t i = 0; i < h; i++)
 		{
 			for (size_t j = 0; j < w; j++)
-			{
-				byte v = nextbit(f, &buf, &buf_avail) ? 255 : 0;
-				PIX(img, i, j).r = v;
-				PIX(img, i, j).g = v;
-				PIX(img, i, j).b = v;
-			}
+				P(i, j) = nextbit(f, &buf, &buf_avail) ? 255 : 0;
 			buf_avail = 0;
 		}
 	}
@@ -110,9 +96,4 @@ void pbm_file_to_bitmap(bitmap_t* img, FILE* f)
 		fprintf(stderr, "Unsupported format '%c'\n", format);
 		exit(1);
 	}
-}
-
-void pbm_del(bitmap_t* img)
-{
-	free(img->data);
 }

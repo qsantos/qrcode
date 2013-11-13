@@ -40,21 +40,10 @@ static unsigned int get_bits(scanner_t* scanner, size_t n)
 	}
 	return res;
 }
-void qrc_decode(bitmap_t* img)
+void qrc_decode(scanner_t* scanner)
 {
-	scanner_t _scanner;
-	scanner_t* scanner = &_scanner;
-
-	scanner->d = img->data;
-
 	// size
-	size_t s = img->width;
-	if (s != img->height)
-	{
-		fprintf(stderr, "Non-square image\n");
-		exit(1);
-	}
-	scanner->s = s;
+	size_t s = scanner->s;
 
 	// finders
 	check_finder(scanner, 0, 0);
