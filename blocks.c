@@ -17,17 +17,10 @@ static void get_block(scanner_t* scanner)
 	else
 		scanner->block_cur++;
 
-	const int* b = scanner->blocks;
+	const byte* b = scanner->blocks;
 
-	// find the current block
-	size_t i = 0;
-	int n = scanner->block_cur - b[0];
-	while (n >= 0)
-	{
-		i += 3;
-		n -= b[i];
-	}
-	size_t ndata = b[i+2];
+	// find the size of the current block
+	size_t ndata = scanner->block_cur < b[0] ? b[2] : b[5];
 	scanner->block_dataw = ndata;
 
 	// rewind

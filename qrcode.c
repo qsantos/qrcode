@@ -58,7 +58,7 @@ void qrc_decode(scanner_t* scanner)
 	// error correction level
 	int c = (!P(s-1,8))*2 + (!P(s-2,8));
 
-	static const int blocks[160][7] =
+	static const byte blocks[160][7] =
 	{
 #include "blocksizes.h"
 	};
@@ -68,7 +68,7 @@ void qrc_decode(scanner_t* scanner)
 	scanner->j = s-1;
 
 	// initialize block information
-	const int* b = blocks[4*(v-1) + c];
+	const byte* b = blocks[4*(v-1) + c];
 	scanner->blocks = b;
 	// count all the blocks
 	{

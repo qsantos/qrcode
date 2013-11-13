@@ -19,7 +19,7 @@ struct scanner
 	size_t j;
 
 	// block splitting
-	const int* blocks; // block information
+	const byte* blocks; // block information
 	size_t block_count;   // total number of blocks
 	size_t block_cur;     // current block
 	size_t block_dataw;   // number of its data words
