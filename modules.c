@@ -138,12 +138,10 @@ void next_bit(scanner_t* scanner)
 	scanner->j = j;
 }
 
-void next_codeword(scanner_t* scanner)
+void skip_bits(scanner_t* scanner, size_t n)
 {
-	// skip the interleaved blocks
-	for (size_t i = 1; i < scanner->block_count; i++)
-		for (size_t j = 0; j < 8; j++)
-			next_bit(scanner);
+	while (n--)
+		next_bit(scanner);
 }
 
 byte get_codeword(scanner_t* scanner)
@@ -158,7 +156,6 @@ byte get_codeword(scanner_t* scanner)
 		next_bit(scanner);
 	}
 
-	next_codeword(scanner);
 	return res;
 }
 
@@ -171,6 +168,4 @@ void put_codeword(scanner_t* scanner, byte w)
 
 		P(scanner->i, scanner->j) = mask(scanner, bit);
 	}
-
-	next_codeword(scanner);
 }

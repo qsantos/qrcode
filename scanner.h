@@ -11,6 +11,7 @@ struct scanner
 {
 	size_t s; // size
 	int    v; // version
+	int    c; // correction level
 	byte*  d; // data
 	int    m; // mask
 
@@ -19,14 +20,11 @@ struct scanner
 	size_t j;
 
 	// block splitting
-	const byte* blocks; // block information
-	size_t block_count;   // total number of blocks
 	size_t block_cur;     // current block
 	size_t block_dataw;   // number of its data words
-	size_t cur_word;      // current word
 
 	// block buffer
-	byte*  block_data;
+	byte   block_data[163]; // max block length is 163
 	size_t block_curbyte;
 	size_t block_curbit;
 };

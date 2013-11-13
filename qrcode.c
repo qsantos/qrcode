@@ -56,27 +56,13 @@ void qrc_decode(scanner_t* scanner)
 	scanner->m = 4*P(s-3,8) + 2*P(s-4,8) + P(s-5,8);
 
 	// error correction level
-	int c = (!P(s-1,8))*2 + (!P(s-2,8));
-
-	static const byte blocks[160][7] =
-	{
-#include "blocksizes.h"
-	};
+	scanner->c = (!P(s-1,8))*2 + (!P(s-2,8));
 
 	// initialize module reading
 	scanner->i = s-1;
 	scanner->j = s-1;
 
 	// initialize block information
-	const byte* b = blocks[4*(v-1) + c];
-	scanner->blocks = b;
-	// count all the blocks
-	{
-		int n = 0;
-		for (size_t i = 0; b[i]; i+=3)
-			n += b[i];
-		scanner->block_count = n;
-	}
 	scanner->block_dataw = 0;
 
 	while (1)
