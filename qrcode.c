@@ -58,12 +58,8 @@ void qrc_decode(scanner_t* scanner)
 	// error correction level
 	scanner->c = (!P(s-1,8))*2 + (!P(s-2,8));
 
-	// initialize module reading
-	scanner->i = s-1;
-	scanner->j = s-1;
-
-	// initialize block information
-	scanner->block_dataw = 0;
+	// initialize reading
+	scanner->block_cur = 0;
 
 	while (1)
 	{

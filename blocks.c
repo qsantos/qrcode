@@ -17,7 +17,7 @@ static void get_block(scanner_t* scanner)
 	const byte* b = blocks[4*(scanner->v-1) + scanner->c];
 
 	// current block
-	size_t cur = scanner->block_dataw ? scanner->block_cur+1 : 0;
+	size_t cur = scanner->block_cur;
 
 	// find the data size of the current block
 	size_t ndata = cur < b[0] ? b[2] : b[5];
@@ -39,26 +39,28 @@ static void get_block(scanner_t* scanner)
 		skip_bits(scanner, (b[0]+b[3]-1) * 8);
 	}
 
-	scanner->block_cur = cur;
+	scanner->block_cur = cur+1;
 	scanner->block_curbyte = 0;
 	scanner->block_curbit = 0;
 }
 
 unsigned int get_bits(scanner_t* scanner, size_t n)
 {
+	if (!scanner->block_cur)
+		get_block(scanner);
+
 	// this buffer handling is an abomination
 	unsigned int res = 0;
 	while (n--)
 	{
-		// this condition is an abomination
-		if (!scanner->block_dataw || scanner->block_curbyte >= scanner->block_dataw)
+		if (scanner->block_curbyte >= scanner->block_dataw)
 			get_block(scanner);
 
-		// this bit-field handling is an abomination
+		size_t B = scanner->block_curbyte;
+		size_t b = scanner->block_curbit;
 		res *= 2;
-		res += (scanner->block_data[scanner->block_curbyte] >> (7-scanner->block_curbit)) & 1;
+		res += (scanner->block_data[B] >> (7-b)) & 1;
 
-		// meh
 		scanner->block_curbit++;
 		if (scanner->block_curbit >= 8)
 		{
