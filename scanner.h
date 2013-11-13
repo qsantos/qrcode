@@ -20,10 +20,10 @@ struct scanner
 
 	// block splitting
 	const int* blocks; // block information
-	int block_count;   // total number of blocks
-	int block_cur;     // current block
-	int block_dataw;   // number of its data words
-	int cur_word;      // current word
+	size_t block_count;   // total number of blocks
+	size_t block_cur;     // current block
+	size_t block_dataw;   // number of its data words
+	size_t cur_word;      // current word
 
 	// block buffer
 	byte*  block_data;

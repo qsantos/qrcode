@@ -63,6 +63,10 @@ void qrc_decode(scanner_t* scanner)
 #include "blocksizes.h"
 	};
 
+	// initialize module reading
+	scanner->i = s-1;
+	scanner->j = s-1;
+
 	// initialize block information
 	const int* b = blocks[4*(v-1) + c];
 	scanner->blocks = b;
@@ -73,16 +77,7 @@ void qrc_decode(scanner_t* scanner)
 			n += b[i];
 		scanner->block_count = n;
 	}
-	scanner->block_cur = 0;
-	scanner->block_dataw = b[2];
-	scanner->cur_word = 0;
-
-	// initialize geting
-	scanner->i = s-1;
-	scanner->j = s-1;
-	scanner->block_data = NULL;
-	scanner->block_curbyte = 1; // TODO
-	scanner->block_curbit = 0;
+	scanner->block_dataw = 0;
 
 	while (1)
 	{

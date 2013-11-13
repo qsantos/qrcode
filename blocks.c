@@ -9,11 +9,43 @@ static void get_block(scanner_t* scanner);
 
 static void get_block(scanner_t* scanner)
 {
-	if (scanner->block_data == NULL)
+	if (!scanner->block_dataw)
 	{
-		scanner->block_data = (byte*) malloc(sizeof(byte));
+		scanner->block_cur = 0;
+		scanner->block_data = NULL;
 	}
-	scanner->block_data[0] = get_codeword(scanner);
+	else
+		scanner->block_cur++;
+
+	const int* b = scanner->blocks;
+
+	// find the current block
+	size_t i = 0;
+	int n = scanner->block_cur - b[0];
+	while (n >= 0)
+	{
+		i += 3;
+		n -= b[i];
+	}
+	size_t ndata = b[i+2];
+	scanner->block_dataw = ndata;
+
+	// rewind
+	scanner->i = scanner->s-1;
+	scanner->j = scanner->s-1;
+
+	// skip the previous blocks
+	for (size_t i = 0; i < scanner->block_cur; i++)
+		for (size_t j = 0; j < 8; j++)
+			next_bit(scanner);
+
+	free(scanner->block_data);
+	scanner->block_data = (byte*) malloc(sizeof(byte) * ndata);
+
+	scanner->cur_word = 0;
+	for (size_t i = 0; i < ndata; i++)
+		scanner->block_data[i] = get_codeword(scanner);
+
 	scanner->block_curbyte = 0;
 	scanner->block_curbit = 0;
 }

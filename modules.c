@@ -2,8 +2,6 @@
 
 static int  is_data (scanner_t* scanner, size_t i, size_t j);
 static byte mask    (scanner_t* scanner, byte bit);
-static void next_bit(scanner_t* scanner);
-static void next_codeword(scanner_t* scanner);
 
 static int is_data(scanner_t* scanner, size_t i, size_t j)
 {
@@ -101,7 +99,7 @@ static byte mask(scanner_t* scanner, byte bit)
 	return bit;
 }
 
-static void next_bit(scanner_t* scanner)
+void next_bit(scanner_t* scanner)
 {
 	size_t i = scanner->i;
 	size_t j = scanner->j;
@@ -140,43 +138,12 @@ static void next_bit(scanner_t* scanner)
 	scanner->j = j;
 }
 
-static void next_codeword(scanner_t* scanner)
+void next_codeword(scanner_t* scanner)
 {
-	// if at the end of a block, get back to the start of the next
-	if (++scanner->cur_word >= scanner->block_dataw)
-	{
-		const int* b = scanner->blocks;
-
-		// find the current block
-		size_t i = 0;
-		scanner->block_cur++;
-		int n = scanner->block_cur - b[0];
-		while (n >= 0)
-		{
-			i += 3;
-			n -= b[i];
-		}
-
-		// rewind
-		scanner->i = scanner->s-1;
-		scanner->j = scanner->s-1;
-
-		// set info
-		scanner->block_dataw = b[i+2];
-		scanner->cur_word = 0;
-
-		// skip the previous blocks
-		for (int i = 0; i < scanner->block_cur; i++)
-			for (size_t j = 0; j < 8; j++)
-				next_bit(scanner);
-	}
-	// otherwise, skip the interleaved blocks
-	else
-	{
-		for (int i = 1; i < scanner->block_count; i++)
-			for (size_t j = 0; j < 8; j++)
-				next_bit(scanner);
-	}
+	// skip the interleaved blocks
+	for (size_t i = 1; i < scanner->block_count; i++)
+		for (size_t j = 0; j < 8; j++)
+			next_bit(scanner);
 }
 
 byte get_codeword(scanner_t* scanner)
