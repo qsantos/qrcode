@@ -53,9 +53,9 @@ static int is_data(scanner_t* scanner, size_t i, size_t j)
 	size_t s = scanner->s;
 
 	// finders and format information
-	if (i <= 8   && j <= 8) return 1; // top-left
-	if (i <= 8 && j >= s-8) return 1; // top-right
-	if (j <= 8 && i >= s-8) return 1; // bottom-left
+	if (i <= 8   && j <= 8) return 0; // top-left
+	if (i <= 8 && j >= s-8) return 0; // top-right
+	if (j <= 8 && i >= s-8) return 0; // bottom-left
 
 	if (scanner->v >= 7)
 	{
@@ -65,12 +65,12 @@ static int is_data(scanner_t* scanner, size_t i, size_t j)
 	}
 
 	// timings
-	if (i == 6) return 1;
-	if (j == 6) return 1;
+	if (i == 6) return 0;
+	if (j == 6) return 0;
 
 	// alignments
-	if (i <= 8 && j >= s-10) return 0;
-	if (j <= 8 && i >= s-10) return 0;
+	if (i <= 8 && j >= s-10) return 1;
+	if (j <= 8 && i >= s-10) return 1;
 	static const size_t aligns[][8] =
 	{
 		{ 0, },
@@ -122,7 +122,7 @@ static int is_data(scanner_t* scanner, size_t i, size_t j)
 	for (const size_t* a = aligns[scanner->v]; *a && !coll_y; a++)
 		coll_y = (*a-2 <= j && j <= *a+2);
 
-	return coll_x && coll_y;
+	return !(coll_x && coll_y);
 }
 static byte read_bit(scanner_t* scanner)
 {
@@ -150,11 +150,7 @@ static byte read_bit(scanner_t* scanner)
 	{
 		if ((j/2) % 2 == 0)
 		{
-			if (j % 2 == 0)
-			{
-				j--;
-			}
-			else if (i >= scanner->s-1)
+			if (j % 2 == 0 || i >= scanner->s-1)
 			{
 				j--;
 			}
@@ -166,11 +162,7 @@ static byte read_bit(scanner_t* scanner)
 		}
 		else
 		{
-			if (j % 2 == 0)
-			{
-				j--;
-			}
-			else if (i <= 0)
+			if (j % 2 == 0 || i <= 0)
 			{
 				j--;
 			}
@@ -181,7 +173,7 @@ static byte read_bit(scanner_t* scanner)
 			}
 		}
 	}
-	while (is_data(scanner,i,j));
+	while (!is_data(scanner,i,j));
 
 	scanner->i = i;
 	scanner->j = j;
@@ -285,7 +277,6 @@ void qrc_decode(bitmap_t* img)
 		fprintf(stderr, "Unsupported version '%zu'\n", v);
 		exit(1);
 	}
-	printf("Version %zu\n", v);
 	scanner->v = v;
 
 	// mask
