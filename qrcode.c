@@ -57,9 +57,12 @@ static int is_data(scanner_t* scanner, size_t i, size_t j)
 	if (i <= 8 && j >= s-8) return 1; // top-right
 	if (j <= 8 && i >= s-8) return 1; // bottom-left
 
-	// version information
-	if (i < 6 && j >= s-11) return 1; // top-right
-	if (j < 6 && i >= s-11) return 1; // bottom-left
+	if (scanner->v >= 7)
+	{
+		// version information
+		if (i < 6 && j >= s-11) return 0; // top-right
+		if (j < 6 && i >= s-11) return 0; // bottom-left
+	}
 
 	// timings
 	if (i == 6) return 1;
