@@ -2,10 +2,9 @@
 
 #include <stdlib.h>
 
-#include "modules.h"
+#include "blocks.h"
 
-static void         check_finder(scanner_t* scanner, size_t i, size_t j);
-static unsigned int get_bits    (scanner_t* scanner, size_t n);
+static void check_finder(scanner_t* scanner, size_t i, size_t j);
 
 static void check_finder(scanner_t* scanner, size_t i, size_t j)
 {
@@ -27,22 +26,7 @@ static void check_finder(scanner_t* scanner, size_t i, size_t j)
 			exit(1);
 		}
 }
-static unsigned int get_bits(scanner_t* scanner, size_t n)
-{
-	unsigned int res = 0;
-	while (n)
-	{
-		if (!scanner->buf_avail)
-		{
-			scanner->buf = get_codeword(scanner);
-			scanner->buf_avail = 8;
-		}
-		res = res*2 + ((scanner->buf >> (scanner->buf_avail-1))& 1);
-		scanner->buf_avail--;
-		n--;
-	}
-	return res;
-}
+
 void qrc_decode(scanner_t* scanner)
 {
 	// size
@@ -96,8 +80,9 @@ void qrc_decode(scanner_t* scanner)
 	// initialize geting
 	scanner->i = s-1;
 	scanner->j = s-1;
-	scanner->buf = 0;
-	scanner->buf_avail = 0;
+	scanner->block_data = NULL;
+	scanner->block_curbyte = 1; // TODO
+	scanner->block_curbit = 0;
 
 	while (1)
 	{

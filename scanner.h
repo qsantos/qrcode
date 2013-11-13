@@ -14,6 +14,10 @@ struct scanner
 	byte*  d; // data
 	int    m; // mask
 
+	// current module
+	size_t i;
+	size_t j;
+
 	// block splitting
 	const int* blocks; // block information
 	int block_count;   // total number of blocks
@@ -21,13 +25,10 @@ struct scanner
 	int block_dataw;   // number of its data words
 	int cur_word;      // current word
 
-	// current bit
-	size_t i;
-	size_t j;
-
-	// codeword buffer
-	byte   buf;
-	size_t buf_avail;
+	// block buffer
+	byte*  block_data;
+	size_t block_curbyte;
+	size_t block_curbit;
 };
 
 #endif
