@@ -41,6 +41,7 @@ static byte nextint(FILE* f)
 	}
 	return res;
 }
+
 static byte nextbit(FILE* f, byte* buf, size_t* buf_avail)
 {
 	if (!*buf_avail)
@@ -50,6 +51,7 @@ static byte nextbit(FILE* f, byte* buf, size_t* buf_avail)
 	}
 	return (*buf >> (--(*buf_avail))) & 1;
 }
+
 void load_pbm(scanner_t* scanner, FILE* f)
 {
 	fgetc(f); // reads 'P'
@@ -64,7 +66,7 @@ void load_pbm(scanner_t* scanner, FILE* f)
 		exit(1);
 	}
 
-	bit* d = (bit*) malloc(sizeof(bit) * w*h);
+	byte* d = (byte*) malloc(sizeof(byte) * w*h);
 	if (!d)
 	{
 		fprintf(stderr, "Could not allocate memory\n");

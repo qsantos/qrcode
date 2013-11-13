@@ -143,14 +143,14 @@ static void next_bit(scanner_t* scanner)
 static void next_codeword(scanner_t* scanner)
 {
 	// if at the end of a block, get back to the start of the next
-	if (++scanner->cur_word >= scanner->cur_words)
+	if (++scanner->cur_word >= scanner->block_dataw)
 	{
 		const int* b = scanner->blocks;
 
 		// find the current block
 		size_t i = 0;
-		scanner->cur_block++;
-		int n = scanner->cur_block - b[0];
+		scanner->block_cur++;
+		int n = scanner->block_cur - b[0];
 		while (n >= 0)
 		{
 			i += 3;
@@ -162,18 +162,18 @@ static void next_codeword(scanner_t* scanner)
 		scanner->j = scanner->s-1;
 
 		// set info
-		scanner->cur_words = b[i+2];
+		scanner->block_dataw = b[i+2];
 		scanner->cur_word = 0;
 
 		// skip the previous blocks
-		for (int i = 0; i < scanner->cur_block; i++)
+		for (int i = 0; i < scanner->block_cur; i++)
 			for (size_t j = 0; j < 8; j++)
 				next_bit(scanner);
 	}
 	// otherwise, skip the interleaved blocks
 	else
 	{
-		for (int i = 1; i < scanner->n_blocks; i++)
+		for (int i = 1; i < scanner->block_count; i++)
 			for (size_t j = 0; j < 8; j++)
 				next_bit(scanner);
 	}

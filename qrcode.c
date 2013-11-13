@@ -4,6 +4,9 @@
 
 #include "modules.h"
 
+static void         check_finder(scanner_t* scanner, size_t i, size_t j);
+static unsigned int get_bits    (scanner_t* scanner, size_t n);
+
 static void check_finder(scanner_t* scanner, size_t i, size_t j)
 {
 	static const char mask[7][7] =
@@ -76,6 +79,7 @@ void qrc_decode(scanner_t* scanner)
 #include "blocksizes.h"
 	};
 
+	// initialize block information
 	const int* b = blocks[4*(v-1) + c];
 	scanner->blocks = b;
 	// count all the blocks
@@ -83,10 +87,10 @@ void qrc_decode(scanner_t* scanner)
 		int n = 0;
 		for (size_t i = 0; b[i]; i+=3)
 			n += b[i];
-		scanner->n_blocks = n;
+		scanner->block_count = n;
 	}
-	scanner->cur_block = 0;
-	scanner->cur_words = b[2];
+	scanner->block_cur = 0;
+	scanner->block_dataw = b[2];
 	scanner->cur_word = 0;
 
 	// initialize geting

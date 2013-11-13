@@ -2,7 +2,6 @@
 #define QRSCANNER_H
 
 #include <sys/types.h>
-typedef unsigned char bit;
 typedef unsigned char byte;
 typedef struct scanner scanner_t;
 
@@ -12,14 +11,14 @@ struct scanner
 {
 	size_t s; // size
 	int    v; // version
-	bit*   d; // data
+	byte*  d; // data
 	int    m; // mask
 
 	// block splitting
 	const int* blocks; // block information
-	int n_blocks;      // total number of blocks
-	int cur_block;     // current block
-	int cur_words;     // number of its data words
+	int block_count;   // total number of blocks
+	int block_cur;     // current block
+	int block_dataw;   // number of its data words
 	int cur_word;      // current word
 
 	// current bit
