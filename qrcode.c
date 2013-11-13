@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "qrmodules.h"
+#include "modules.h"
 
 static void check_finder(scanner_t* scanner, size_t i, size_t j)
 {
@@ -84,7 +84,7 @@ void qrc_decode(bitmap_t* img)
 
 	static const int blocks[160][7] =
 	{
-#include "qrdata.h"
+#include "blocksizes.h"
 	};
 
 	const int* b = blocks[4*(v-1) + c];

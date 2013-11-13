@@ -1,4 +1,4 @@
-#include "qrmodules.h"
+#include "modules.h"
 
 static int  is_data (scanner_t* scanner, size_t i, size_t j);
 static byte mask    (scanner_t* scanner, byte bit);
