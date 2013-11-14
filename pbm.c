@@ -20,7 +20,7 @@ static byte nextint(FILE* f)
 
 		// pass comments
 		if (c == '#')
-			while (fgetc(f) != '\n'); // TODO: feof()
+			while ((c=fgetc(f)) != '\n'); // TODO: feof()
 
 	} while (strchr(" \n\r", c));
 
