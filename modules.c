@@ -151,7 +151,7 @@ byte get_codeword(scanner_t* scanner)
 	{
 		byte bit = P(scanner->i, scanner->j);
 
-		res *=2;
+		res *= 2;
 		res += mask(scanner, bit);
 		next_bit(scanner);
 	}

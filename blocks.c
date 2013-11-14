@@ -35,7 +35,7 @@ static void get_block(scanner_t* scanner)
 	//       necessary ; moreover, the second series of blocks can have one more
 	//       codeword than the first, meaning that one more codeword is to be
 	//       read and that the interleaving only affects the second kind of block
-	size_t n = b[2] - 1;
+	size_t n = b[2] - 1; // n is either ndata-1 (first blocks) or ndata-2 (last ones)
 	for (size_t i = 0; i < n; i++)
 	{
 		scanner->block_data[i] = get_codeword(scanner);
@@ -52,6 +52,23 @@ static void get_block(scanner_t* scanner)
 		skip_bits(scanner, (b[3]-1) * 8);
 
 		scanner->block_data[n+1] = get_codeword(scanner);
+
+	}
+	else
+	{
+		// skip the last interleaved codewords
+		skip_bits(scanner, b[3] * 8);
+	}
+
+	// number of error correction codewords
+	// (same for both types of blocks)
+	n = b[1] - b[2];
+	for (size_t i = 0; i < n-1; i++)
+	{
+		scanner->block_data[ndata+i] = get_codeword(scanner);
+
+		// skip the interleaved codewords
+		skip_bits(scanner, (b[0]+b[3]-1) * 8);
 	}
 
 	scanner->block_cur = cur+1;
