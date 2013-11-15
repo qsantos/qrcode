@@ -28,52 +28,60 @@ static void get_block(scanner_t* scanner)
 	scanner->i = scanner->s-1;
 	scanner->j = scanner->s-1;
 
-	// skip the previous blocks' first codewords
-	skip_bits(scanner, cur * 8);
+	// NOTE: in a symbol, all the blocks have the same number of error
+	//       correction codewords but the first series of blocks can
+	//       have one data codeword less
 
-	// read data
-	// NOTE: the codewords are interleaved to skipping data from other blocks is
-	//       necessary ; moreover, the second series of blocks can have one more
-	//       codeword than the first, meaning that one more codeword is to be
-	//       read and that the interleaving only affects the second kind of block
-	size_t n = b[2] - 1; // n is either ndata-1 (first blocks) or ndata-2 (last ones)
-	for (size_t i = 0; i < n; i++)
+	byte nblocks = b[0]+ b[3];
+
+	// BEGIN read data
+	// the next section handles the inverleaving of data codewords
+
+	// handling the minimal number of codewords
+	// n is either ndata-1 (first blocks) or ndata-2 (last ones)
+	for (size_t i = 0; i < b[2]; i++)
 	{
+		skip_bits(scanner, cur * 8);
 		scanner->block_data[i] = get_codeword(scanner);
-
-		// skip the interleaved codewords
-		skip_bits(scanner, (b[0]+b[3]-1) * 8);
+		skip_bits(scanner, (nblocks-cur-1) * 8);
 	}
-	// last codeword common to both types of blocks
-	scanner->block_data[n] = get_codeword(scanner);
-	// additional codeword of the second type of blocks
-	if (b[2] < ndata)
-	{
-		// skip the interleaved codewords
-		skip_bits(scanner, (b[3]-1) * 8);
 
-		scanner->block_data[n+1] = get_codeword(scanner);
-
-	}
-	else
+	// interleaving specific to the second series of blocks
+	if (b[2] == ndata) // first kind of block
 	{
-		// skip the last interleaved codewords
 		skip_bits(scanner, b[3] * 8);
 	}
+	else // second kind
+	{
+		skip_bits(scanner, (cur-b[0]) * 8);
+		scanner->block_data[ndata-1] = get_codeword(scanner);
+		skip_bits(scanner, (nblocks-cur-1) * 8);
 
-	// number of error correction codewords
-	// (same for both types of blocks)
-	n = b[1] - b[2] - 1;
+	}
+
+	// END read data
+
+
+	// the module pointers is now at the end of all the data and at
+	// the beginning of the interleaved error correction codewords
+
+
+	// BEGIN read correction
+	// this section handles the interleaving of error correction codewords
+
+	size_t n = b[1] - b[2]; // same for both types of blocks
 	for (size_t i = 0; i < n; i++)
 	{
+		skip_bits(scanner, cur * 8);
 		scanner->block_data[ndata+i] = get_codeword(scanner);
-
-		// skip the interleaved codewords
-		skip_bits(scanner, (b[0]+b[3]-1) * 8);
+		skip_bits(scanner, (nblocks-cur-1) * 8);
 	}
-	scanner->block_data[ndata+n] = get_codeword(scanner);
 
-	if (rs_correction(b[1], scanner->block_data, n+1) != 0)
+	// END read correction
+
+
+	// apply Reed-Solomon error correction
+	if (rs_correction(ndata+n, scanner->block_data, n) != 0)
 	{
 		fprintf(stderr, "Could not correct errors\n");
 		exit(1);
