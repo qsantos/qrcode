@@ -22,6 +22,12 @@
 
 #include "blocks.h"
 
+
+
+// please, refer to DOCUMENTATION for technical details
+
+
+
 static void check_finder(scanner_t* scanner, size_t i, size_t j);
 
 static void check_finder(scanner_t* scanner, size_t i, size_t j)

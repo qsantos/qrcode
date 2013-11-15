@@ -21,6 +21,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+// please, refer to DOCUMENTATION for technical details
+
+
+
 static byte nextint(FILE* f);
 static byte nextbit(FILE* f, byte* buf, size_t* buf_avail);
 

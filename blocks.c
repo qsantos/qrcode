@@ -24,6 +24,12 @@
 #include "modules.h"
 #include "correction.h"
 
+
+
+// please, refer to DOCUMENTATION for technical details
+
+
+
 static void get_block(scanner_t* scanner);
 
 static void get_block(scanner_t* scanner)

@@ -20,6 +20,10 @@
 
 #include <string.h>
 
+
+
+// please, refer to DOCUMENTATION for technical details
+
 // error correction algorithms are inspired from
 // https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders
 

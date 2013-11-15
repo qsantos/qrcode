@@ -22,6 +22,12 @@
 #include "pbm.h"
 #include "qrcode.h"
 
+
+
+// please, refer to DOCUMENTATION for technical details
+
+
+
 static void usage(char* name)
 {
 	fprintf(stderr,
