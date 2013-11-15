@@ -11,8 +11,8 @@ struct poly
 	byte c[512]; // coefficients
 };
 
-void rs_calc_syndromes(poly_t* msg, poly_t* synd);
-void rs_find_error    (poly_t* msg, poly_t* synd, poly_t* pos);
-void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos);
+byte rs_calc_syndromes  (poly_t* msg, poly_t* synd);
+byte rs_find_error      (poly_t* msg, poly_t* synd, poly_t* pos);
+void rs_correct_errata  (poly_t* msg, poly_t* synd, poly_t* pos);
 
 #endif

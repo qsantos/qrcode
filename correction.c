@@ -79,14 +79,17 @@ static byte gf_poly_eval(poly_t* p, byte x)
 	return y;
 }
 
-void rs_calc_syndromes(poly_t* msg, poly_t* synd)
+byte rs_calc_syndromes(poly_t* msg, poly_t* synd)
 {
 	gf_init();
+	byte ret = 0;
 	for (size_t i = 0; i < synd->d; i++)
-		synd->c[i] = gf_poly_eval(msg, gf_exp[i]);
+		if ((synd->c[i] = gf_poly_eval(msg, gf_exp[i])) != 0)
+			ret = 1;
+	return ret;
 }
 
-void rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
+byte rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
 {
 	// find error locator polynomial with Berlekamp-Massey algorithm
 	poly_t err = { 0, {1} };
@@ -112,20 +115,21 @@ void rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
 		}
 	}
 	if (err.d > synd->d/2)
-	{
-		return; // too many errors to correct
-	}
+		return 1; // too many errors to correct
 
 	// find zeros of error polynomial
-	pos->d = 0;
+	size_t found = 0;
 	for (size_t i = 0; i <= msg->d; i++)
 		if (gf_poly_eval(&err, gf_exp[255-i]) == 0)
+		{
 			pos->c[pos->d++] = msg->d - i;
+			found++;
+		}
 
-	if (pos->d < err.d)
-	{
-		// couldn't find error locations
-	}
+	if (found < err.d)
+		return 1; // couldn't find error locations
+	
+	return 0;
 }
 
 static void rs_fderivative(poly_t* r, poly_t* p)
