@@ -197,7 +197,7 @@ static byte rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
 
 	if (found < err.d)
 		return 1; // couldn't find error locations
-	
+
 	return 0;
 }
 
