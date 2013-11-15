@@ -332,6 +332,64 @@ the parity is inversed (because of the vertical timing pattern).
 
 
 
+=== Blocks ===
+
+== Content splitting ==
+
+To bound the complexity of the decoding algorithm, the error correction
+algorithm handles no more than 30 error-correction codewords. Depending
+on the size of the QR-code and the error correction level, the number
+of data codewords which can be handled with these 30 error-correction
+codewords is limited.
+
+Thus, the data is split in blocks so that each block needs no more than
+30 error-correction codewords to work. For example, in QR-codes version
+4 and error correction level Q, there are 2 blocks of 24 data codewords
+alongside with 26 error-correction codewords. For a higher alteration
+tolerance, e.g. H, we would choose more blocks with less data, e.g. four
+blocks of 9 data codewords and 16 error correction codewords.
+
+= Listing 4: QR-code 4-Q blocks =
+Block 1: D1  D2  D3  ... D24 E1  E2  ... E26
+Block 2: D25 D26 D27 ... D48 E27 E28 ... E52
+= End of Listing 4 =
+
+== Interleaving ==
+
+To mitigate physicial alterations, the blocks are then
+interleaved. Because an anomaly is expected to involve an area, the
+interleaving should help to share out the errors among the blocks. Without
+the interleaving, an anomaly would probably affect only one block but
+the limited number of error correction codewords would not be sufficient
+to fix them all.
+
+In order to further decrease the risks of one block being corrupted, the
+data codewords and the error-correction codewords are separated. Only
+half the block should be threatened by the anomaly, and hopefully,
+not enough will be to corrupt it.
+
+== Uneven blocks ==
+
+The available content area in a QR-code does not match nicely with
+the size of the blocks. Thus, the data part of some blocks may not be
+filled. However, the number of error-correction codewords per block is
+always the same within a QR-code.
+
+The sizes of the blocks given in the tables are chosen so that there are
+two kinds of blocks within a QR-code: one with n data codeword and one
+with n+1. All the n-blocks are used first, the (n+1)-blocks are used last.
+
+The interleaving for this case is illustrated with a version 5-H QR-code:
+
+= Listing 5: QR-code 5-H blocks =
+Block 1: D1  D2  ... D11     E1  E2  ... E22
+Block 2: D12 D13 ... D22     E23 E24 ... E44
+Block 3: D23 D24 ... D33 D34 E45 E46 ... E66
+Block 4: D35 D36 ... D45 D46 E67 E68 ... E88
+= End of Listing 5 =
+
+
+
 === Bibliography ===
 
 The information used in the design of this program and documentation come
