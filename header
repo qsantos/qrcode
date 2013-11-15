@@ -1,3 +1,24 @@
+#!/bin/bash
+for i in $(find -name "*.[hc]")
+do
+	exec > tmp
+
+	# new header (end of this script)
+	tail -n17 $0
+	echo ""
+
+	# length of the old header
+	line=`grep -Enm1 '^\\\\\*/$' $i`
+	line=${line%%:\\*/}
+	line=${line:--1}
+	line=$(($line+2))
+
+	# skip the old header
+	tail $i -n+$line
+
+	mv tmp $i
+done
+exit 0
 /*\
  *  Yes, This Is Another Barcode Reader
  *  Copyright (C) 2013 Quentin SANTOS
@@ -15,14 +36,3 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*/
-
-#ifndef PBM_H
-#define PBM_H
-
-#include <stdio.h>
-
-#include "scanner.h"
-
-void load_pbm(scanner_t* scanner, FILE* f);
-
-#endif
