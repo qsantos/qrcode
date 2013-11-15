@@ -187,3 +187,34 @@ void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos)
 		msg->c[pos->c[i]] ^= gf_div(y, gf_mul(x,z));
 	}
 }
+
+byte rs_correction(size_t ndata, byte* data, byte nsym)
+{
+	poly_t msg = { ndata-1, {0} };
+	memcpy(msg.c, data, ndata);
+
+	// get syndromes
+	poly_t synd = { nsym, {0} };
+	if (rs_calc_syndromes(&msg, &synd) == 0)
+		return 0; // no errors
+
+	// get erasure positions
+	poly_t pos = { 0, {0} };
+	// TODO
+
+	// convert to Forney syndromes
+	poly_t fsynd;
+	rs_forney_syndromes(&msg, &synd, &pos, &fsynd);
+
+	// find error positions
+	if (rs_find_error(&msg, &fsynd, &pos) != 0)
+		return 1; // error location failed
+
+	// fix erasures and errors
+	rs_correct_errata(&msg, &synd, &pos);
+	if (rs_calc_syndromes(&msg, &synd) != 0)
+		return 1; // message is still not right
+
+	memcpy(data, msg.c, ndata);
+	return 0;
+}
