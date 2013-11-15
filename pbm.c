@@ -36,9 +36,20 @@ static byte nextint(FILE* f)
 		}
 		c = fgetc(f);
 
-		// pass comments
-		if (c == '#')
-			while ((c=fgetc(f)) != '\n'); // TODO: feof()
+		if (c != '#')
+			continue;
+
+		// skip comments
+		do
+		{
+			if (feof(f))
+			{
+				fprintf(stderr, "Unexpected end of file in comment\n");
+				exit(1);
+			}
+			c = fgetc(f);
+		}
+		while (c != '\n');
 
 	} while (strchr(" \n\r", c));
 
