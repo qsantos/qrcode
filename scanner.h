@@ -28,10 +28,10 @@ typedef struct scanner scanner_t;
 
 struct scanner
 {
+	byte*  d; // data
 	size_t s; // size
 	int    v; // version
 	int    c; // correction level
-	byte*  d; // data
 	int    m; // mask
 
 	// current module
