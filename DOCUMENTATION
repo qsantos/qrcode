@@ -301,14 +301,14 @@ column of the current module. If this expression is equal to 0, then
 the current module is to be swapped.
 
 = Listing 2: The 8 masks =
-0  (i*j)%2 + (i*j)%3
-1  (i/2 + j/3)%2
-2  ((i*j)%3 + (i+j)%2)%2   ->  same as ((i*j)%3 + i+j)%2
-3  ((i*j)%2 + (i*j)%3)%2   ->  same as ((i*j)%3 + i*j)%2
-4  i%2
-5  (i+j)%2
-6  (i+j)%3
-7  j%3
+0  (i+j)%2
+1  i%2
+2  j%3
+3  (i+j)%3
+4  (i/2+j/3)%2
+5  (i*j)%2 + (i*j)%3
+6  ((i*j)%2+(i*j)%3)%2   ->  same as ((i*j)%3 + i*j)%2
+7  ((i*j)%3+(i+j)%2)%2   ->  same as ((i*j)%3 + i+j)%2
 = End of Listing 2
 
 When encoding, each mask must be tested in order to find the best one.
