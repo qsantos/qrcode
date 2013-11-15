@@ -18,7 +18,9 @@ information that would not fit on the physicial object.
 
 A QR-code is a square grid block of "modules". A module is a white or
 dark square block. They can be seen as individual pixels but will be
-usually represented as several pixels on a picture.
+usually represented as several pixels on a picture. The "version" of a
+QR-code is a number between 1 and 40 (included) which defines its size:
+the number of modulus on the side of a version 'v' QR-code is 17+4*v.
 
 Examples of QR-codes can be found in the 'examples/' directory. These
 images have been generated using 'qrencode' version 4.3.2 available in
@@ -57,10 +59,9 @@ P1
 = End of Listing 1 =
 
 The first line is information about the format (ASCII black/white
-bitmap). The second line gives the width and height of the image. The
-size of this QR-code is 21 but it can be anything in the set
-{17+4v,1<=v<=40}. Replacing the 0s with spaces and the 1s with Xs gets
-us a more readable representation of the QR-code:
+bitmap). The second line gives the width and height of the image. The size
+of this QR-code is 21 so its version is 1. Replacing the 0s with spaces
+and the 1s with Xs gets us a more readable representation of the QR-code:
 
 = Figure 1: "Hello World!" QR-code =
 
@@ -71,20 +72,20 @@ X   X X X   X   X     X     X   X X X   X
 X   X X X   X       X X X   X   X X X   X
 X           X   X X X   X   X           X
 X X X X X X X   X   X   X   X X X X X X X
-                    X X X                
-X X X X X   X X X X     X X   X   X   X  
+                    X X X
+X X X X X   X X X X     X X   X   X   X
 X X X X X     X   X     X X X X X X X   X
-X     X     X   X     X   X X     X X X  
-        X       X   X     X     X X X    
+X     X     X   X     X   X X     X X X
+        X       X   X     X     X X X
 X X   X X X X X   X X X   X X           X
-                X   X   X         X      
-X X X X X X X   X X     X   X       X X  
-X           X     X X X X X   X   X X    
+                X   X   X         X
+X X X X X X X   X X     X   X       X X
+X           X     X X X X X   X   X X
 X   X X X   X   X       X   X X       X X
-X   X X X   X   X X       X X X X X      
-X   X X X   X   X X X   X     X     X    
-X           X   X X     X X     X X X    
-X X X X X X X   X X X X X   X   X     X  
+X   X X X   X   X X       X X X X X
+X   X X X   X   X X X   X     X     X
+X           X   X X     X X     X X X
+X X X X X X X   X X X X X   X   X     X
 
 = End of Figure 1 =
 
@@ -160,7 +161,7 @@ of the QR-code.
 There are no alignment patterns in the example. They are made of a dark
 module within 5x5 empty square, without any border:
 
-= Figure 3: alignment pattern =
+= Figure 3: Alignment pattern =
 X X X X X
 X 0 0 0 X
 X 0 X 0 X
@@ -171,6 +172,85 @@ X X X X X
 They are used to help the shape-recognition software align the modulus
 grid in bigger QR-codes. Their coordinates varies a bit accross the
 QR-code versions and are given in tables.
+
+
+
+=== Information ===
+
+== Format information ==
+
+Format information is 5-bit long. 10 more bits help correcting errors
+that would happend in this section. These 15 bits are xor-masked with
+101010000010010b before being put twice in the QR-code for redundancy.
+
+In the example (see Figure 4), the 15-bit long masked format information
+is 111110110101010b. It contains the 5 bits 11000b. The three first bits
+110b pick the mask no 6 and the last two set the error correction level
+to 0 (L).
+
+= Figure 4: Format information =
+
+X X X X X X X   0           X X X X X X X
+X           X   1           X           X
+X   X X X   X   0           X   X X X   X
+X   X X X   X   1           X   X X X   X
+X   X X X   X   0           X   X X X   X
+X           X   1           X           X
+X X X X X X X   X   X   X   X X X X X X X
+                0
+1 1 1 1 1 0 X 1 1         1 0 1 0 1 0 1 0
+
+            X
+
+            X
+                X
+X X X X X X X   1
+X           X   0
+X   X X X   X   1
+X   X X X   X   1
+X   X X X   X   1
+X           X   1
+X X X X X X X   1
+
+= End of Figure 4 =
+
+== Version information ==
+
+NOTE: the version information is only present from version 7 to 40
+
+The version information is just the version of the QR-code. It is
+directly encoded within the image to help the infering of the size of
+the moduli. The version takes 6 bits, plus 12 error correction bits. No
+masking is applied and the 18-bit long chain can be found in two locations
+as shown in Figure 5 for a version 8 QR-code.
+
+= Figure 5: Version information =
+X X X X X X X             0 0 1   X X X X X X X
+X           X             1 1 1   X           X
+X   X X X   X             0 1 1   X   X X X   X
+X   X X X   X    (...)    0 1 0   X   X X X   X
+X   X X X   X             0 0 0   X   X X X   X
+X           X             1 0 0   X           X
+X X X X X X X   X     X   X   X   X X X X X X X
+
+            X
+(...)
+0 1 0 0 0 1 X
+0 1 1 1 0 0
+1 1 1 0 0 0 X
+
+X X X X X X X
+X           X
+X   X X X   X
+X   X X X   X
+X   X X X   X
+X           X
+X X X X X X X
+= End of Figure 5 =
+
+The previous figure shows a version information chain of
+001000010110111100b (bottom-to-top, right-to-left), which corresponds
+to the 6-bit number 001000b, for version 8, as expected.
 
 
 
