@@ -102,7 +102,7 @@ void qrc_decode(scanner_t* scanner)
 			else if (v >= 10) lenbits = 11;
 			size_t len = get_bits(scanner, lenbits);
 
-			static const char* map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%%*+-./:";
+			static const char* map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 			for (; len >= 2; len-=2)
 			{
 				unsigned int c = get_bits(scanner, 11);
