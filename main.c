@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "pbm.h"
-#include "qrcode.h"
+#include "decoder.h"
 
 
 
