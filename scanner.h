@@ -27,6 +27,9 @@ struct scanner
 	byte   block_data[163]; // max block length is 163
 	size_t block_curbyte;
 	size_t block_curbit;
+
+	// options
+	char verbosity; // verbosity level
 };
 
 #endif

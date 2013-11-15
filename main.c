@@ -12,10 +12,15 @@ static void usage(char* name)
 		"\n"
 		"  -V, --version  display the version of this program\n"
 		"  -h, --help     print this help\n"
+		"\n"
+		"  -v  --verbose  increase verbosity\n"
 		, name);
 }
 int main(int argc, char** argv)
 {
+	scanner_t scanner;
+	scanner.verbosity = 0;
+
 	FILE* f = stdin;
 
 	int curarg = 1;
@@ -34,6 +39,10 @@ int main(int argc, char** argv)
 			fprintf(stderr, "Compiled on %s at %s\n", __DATE__, __TIME__);
 			exit(1);
 		}
+		else if (strcmp(arg, "--verbose") == 0 || strcmp(arg, "-v") == 0)
+		{
+			scanner.verbosity = 1;
+		}
 		else
 		{
 			f = fopen(arg, "r");
@@ -45,11 +54,8 @@ int main(int argc, char** argv)
 		}
 	}
 
-	scanner_t scanner;
 	load_pbm(&scanner, f);
-
 	qrc_decode(&scanner);
-
 	free(scanner.d);
 	return 0;
 }
