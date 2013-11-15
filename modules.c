@@ -110,14 +110,14 @@ static byte mask(scanner_t* scanner, byte bit)
 	size_t j = scanner->j;
 	switch (scanner->m)
 	{
-	case 0: bit ^= 0 == (i*j)%2 + (i*j)%3;   break;
-	case 1: bit ^= 0 == (i/2+j/3)%2;         break;
-	case 2: bit ^= 0 == ((i*j)%3+(i+j)%2)%2; break;
-	case 3: bit ^= 0 == ((i*j)%2+(i*j)%3)%2; break;
-	case 4: bit ^= 0 == i%2;                 break;
-	case 5: bit ^= 0 == (i+j)%2;             break;
-	case 6: bit ^= 0 == (i+j)%3;             break;
-	case 7: bit ^= 0 == j%3;                 break;
+	case 0: bit ^= 0 == (i+j)%2;             break;
+	case 1: bit ^= 0 == i%2;                 break;
+	case 2: bit ^= 0 == j%3;                 break;
+	case 3: bit ^= 0 == (i+j)%3;             break;
+	case 4: bit ^= 0 == (i/2+j/3)%2;         break;
+	case 5: bit ^= 0 == (i*j)%2 + (i*j)%3;   break;
+	case 6: bit ^= 0 == ((i*j)%2+(i*j)%3)%2; break;
+	case 7: bit ^= 0 == ((i*j)%3+(i+j)%2)%2; break;
 	default: return 0;
 	}
 	return bit;

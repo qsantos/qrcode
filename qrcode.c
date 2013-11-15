@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "blocks.h"
+#include "bch.h"
 
 
 
@@ -76,11 +77,34 @@ void qrc_decode(scanner_t* scanner)
 	}
 	scanner->v = v;
 
-	// mask
-	scanner->m = 4*P(s-3,8) + 2*P(s-4,8) + P(s-5,8);
+	// format information
+	bch_t format1 = 0;
+	for (int i = 0; i <= 5; i++)
+		format1 = 2*format1 + P(8,i);
+	format1 = 2*format1 + P(8,7);
+	format1 = 2*format1 + P(8,8);
+	format1 = 2*format1 + P(7,8);
+	for (int i = 5; i >= 0; i--)
+		format1 = 2*format1 + P(i,8);
+	format1 = bch_decode(0x537, format1 ^ 0x5412);
 
-	// error correction level
-	scanner->c = (!P(s-1,8))*2 + (!P(s-2,8));
+	bch_t format2 = 0;
+	for (int i = 1; i <= 7; i++)
+		format2 = 2*format2 + P(s-i,8);
+	for (int i = 8; i >= 1; i--)
+		format2 = 2*format2 + P(8,s-i);
+	format2 = bch_decode(0x537, format2 ^ 0x5412);
+
+	if ((format1 < 0 && format2 < 0) || format1 != format2)
+	{
+		fprintf(stderr, "Format information corrupted\n");
+		exit(1);
+	}
+
+	int format = format1 & format2;
+	scanner->m = format & 0x7;      // mask
+	byte ECLs[] = { 1, 0, 3, 2 };   // yes, absurd (see Table 25)
+	scanner->c = ECLs[format >> 3]; // Error Correction Level
 
 	if (scanner->verbosity > 0)
 		printf("Version %zu-%c (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
