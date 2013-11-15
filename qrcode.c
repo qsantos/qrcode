@@ -58,9 +58,11 @@ void qrc_decode(scanner_t* scanner)
 	// error correction level
 	scanner->c = (!P(s-1,8))*2 + (!P(s-2,8));
 
-	// initialize reading
-	scanner->block_cur = 0;
+	if (scanner->verbosity > 0)
+		printf("Version %zu-%c (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
 
+	// decode data
+	scanner->block_cur = 0;
 	while (1)
 	{
 		byte enc = get_bits(scanner, 4);
