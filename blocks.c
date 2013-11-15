@@ -21,8 +21,8 @@ static void get_block(scanner_t* scanner)
 	size_t cur = scanner->block_cur;
 
 	// find the data size of the current block
-	size_t ndata = cur < b[0] ? b[2] : b[5];
-	scanner->block_dataw = ndata;
+	size_t n_data = cur < b[0] ? b[2] : b[5];
+	scanner->block_dataw = n_data;
 
 	// rewind to start of symbol
 	scanner->i = scanner->s-1;
@@ -38,7 +38,7 @@ static void get_block(scanner_t* scanner)
 	// the next section handles the inverleaving of data codewords
 
 	// handling the minimal number of codewords
-	// n is either ndata-1 (first blocks) or ndata-2 (last ones)
+	// n is either n_data-1 (first blocks) or n_data-2 (last ones)
 	for (size_t i = 0; i < b[2]; i++)
 	{
 		skip_bits(scanner, cur * 8);
@@ -47,14 +47,14 @@ static void get_block(scanner_t* scanner)
 	}
 
 	// interleaving specific to the second series of blocks
-	if (b[2] == ndata) // first kind of block
+	if (b[2] == n_data) // first kind of block
 	{
 		skip_bits(scanner, b[3] * 8);
 	}
 	else // second kind
 	{
 		skip_bits(scanner, (cur-b[0]) * 8);
-		scanner->block_data[ndata-1] = get_codeword(scanner);
+		scanner->block_data[n_data-1] = get_codeword(scanner);
 		skip_bits(scanner, (nblocks-cur-1) * 8);
 
 	}
@@ -69,11 +69,11 @@ static void get_block(scanner_t* scanner)
 	// BEGIN read correction
 	// this section handles the interleaving of error correction codewords
 
-	size_t n = b[1] - b[2]; // same for both types of blocks
-	for (size_t i = 0; i < n; i++)
+	size_t n_errwords = b[1] - b[2]; // same for both types of blocks
+	for (size_t i = 0; i < n_errwords; i++)
 	{
 		skip_bits(scanner, cur * 8);
-		scanner->block_data[ndata+i] = get_codeword(scanner);
+		scanner->block_data[n_data+i] = get_codeword(scanner);
 		skip_bits(scanner, (nblocks-cur-1) * 8);
 	}
 
@@ -81,7 +81,7 @@ static void get_block(scanner_t* scanner)
 
 
 	// apply Reed-Solomon error correction
-	if (rs_correction(ndata+n, scanner->block_data, n) != 0)
+	if (rs_correction(n_data+n_errwords, scanner->block_data, n_errwords) != 0)
 	{
 		fprintf(stderr, "Could not correct errors\n");
 		exit(1);

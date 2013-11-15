@@ -188,10 +188,10 @@ void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos)
 	}
 }
 
-byte rs_correction(size_t ndata, byte* data, byte nsym)
+byte rs_correction(size_t n_data, byte* data, byte nsym)
 {
-	poly_t msg = { ndata-1, {0} };
-	memcpy(msg.c, data, ndata);
+	poly_t msg = { n_data-1, {0} };
+	memcpy(msg.c, data, n_data);
 
 	// get syndromes
 	poly_t synd = { nsym, {0} };
@@ -215,6 +215,6 @@ byte rs_correction(size_t ndata, byte* data, byte nsym)
 	if (rs_calc_syndromes(&msg, &synd) != 0)
 		return 1; // message is still not right
 
-	memcpy(data, msg.c, ndata);
+	memcpy(data, msg.c, n_data);
 	return 0;
 }
