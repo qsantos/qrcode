@@ -1,7 +1,40 @@
+###########################################################################
+##########                                                       ##########
+##########                       DOCUMENTATION                   ##########
+##########                                                       ##########
+###########################################################################
+
+<< Table of contents >>
+
+ Introduction
+ QR-code appearance
+ Patterns
+ * Finder patterns
+ * Timing patterns
+ * Alignment patterns
+ Information
+ * Format information
+ * Version information
+ Masking
+ Codewords
+ Blocks
+ * Content splitting
+ * Interleaving
+ * Uneven blocks
+ Error correction
+ Bibliography
+
+
 === Introduction ===
 
-This file intends to give a clear overview of the way QR-codes works. A
-QR-code is basically a two-dimensional barcode. It is designed to be
+This file intends to give a clear overview of the way QR-codes works. It
+is short enough to be read end-to-end easily and contain enough
+information to understand the overall idea of QR-encoding. However,
+for more technical information and value tables, please refere to the
+specification and other sources of information in the bibliography at
+the end of the file.
+
+A QR-code is basically a two-dimensional barcode. It is designed to be
 easily recognised in a picture (typically shot from a mobile phone) and
 to withstand against alterations (physical alteration of the support,
 lens flare or recognition glitch).
