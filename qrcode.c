@@ -76,6 +76,32 @@ void qrc_decode(scanner_t* scanner)
 		exit(1);
 	}
 	scanner->v = v;
+	if (v >= 7)
+	{
+		int version1 = 0;
+		for (size_t i = 0; i < 6; i++)
+			for (size_t j = 0; j < 3; j++)
+				version1 = 2*version1 + P(i, s-11+j);
+		version1 = bch_decode(0x1f25, version1);
+
+		int version2 = 0;
+		for (size_t i = 0; i < 6; i++)
+			for (size_t j = 0; j < 3; j++)
+				version2 = 2*version2 + P(i, s-11+j);
+		version2 = bch_decode(0x1f25, version2);
+
+		if ((version1 < 0 && version2 < 0) || version1 != version2)
+		{
+			fprintf(stderr, "Version information corrupted\n");
+			exit(1);
+		}
+
+		if (version1 != (int) v)
+		{
+			fprintf(stderr, "Version information mismatches size\n");
+			exit(1);
+		}
+	}
 
 	// format information
 	bch_t format1 = 0;
