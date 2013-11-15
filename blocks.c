@@ -73,7 +73,7 @@ static void get_block(scanner_t* scanner)
 	}
 	scanner->block_data[ndata+n] = get_codeword(scanner);
 
-	if (rs_correction(b[1], scanner->block_data, 7) != 0)
+	if (rs_correction(b[1], scanner->block_data, n+1) != 0)
 	{
 		fprintf(stderr, "Could not correct errors\n");
 		exit(1);
