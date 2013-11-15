@@ -1,0 +1,191 @@
+=== Introduction ===
+
+This file intends to give a clear overview of the way QR-codes works. A
+QR-code is basically a two-dimensional barcode. It is designed to be
+easily recognised in a picture (typically shot from a mobile phone) and
+to withstand against alterations (physical alteration of the support,
+lens flare or recognition glitch).
+
+Their main use is to allow an user to easily access a piece of
+information on a physical object using computer-like device (well, a
+mobile phone). For example, consumer products often contain an URL to
+a promotionnal webpage. An URL could also link to a detailed pack of
+information that would not fit on the physicial object.
+
+
+
+=== QR-code appearance ===
+
+A QR-code is a square grid block of "modules". A module is a white or
+dark square block. They can be seen as individual pixels but will be
+usually represented as several pixels on a picture.
+
+Examples of QR-codes can be found in the 'examples/' directory. These
+images have been generated using 'qrencode' version 4.3.2 available in
+Debian repositories. It generates PNG files. However, the PBM file format
+(1) is handier to parse. It is basically an ASCII grid of pixels. The
+conversion from PNG to PBM has been done using 'convert' from the
+ImageMagick software suite.
+
+We will consider the 'hw.pbm' example which contains the single string
+"Hello World!". The content of the file is:
+
+= Listing 1: examples/hw.pbm =
+P1
+21 21
+1 1 1 1 1 1 1 0 0 1 0 0 1 0 1 1 1 1 1 1 1
+1 0 0 0 0 0 1 0 1 0 0 1 0 0 1 0 0 0 0 0 1
+1 0 1 1 1 0 1 0 0 1 0 0 0 0 1 0 1 1 1 0 1
+1 0 1 1 1 0 1 0 1 0 0 1 0 0 1 0 1 1 1 0 1
+1 0 1 1 1 0 1 0 0 0 1 1 1 0 1 0 1 1 1 0 1
+1 0 0 0 0 0 1 0 1 1 1 0 1 0 1 0 0 0 0 0 1
+1 1 1 1 1 1 1 0 1 0 1 0 1 0 1 1 1 1 1 1 1
+0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0
+1 1 1 1 1 0 1 1 1 1 0 0 1 1 0 1 0 1 0 1 0
+1 1 1 1 1 0 0 1 0 1 0 0 1 1 1 1 1 1 1 0 1
+1 0 0 1 0 0 1 0 1 0 0 1 0 1 1 0 0 1 1 1 0
+0 0 0 0 1 0 0 0 1 0 1 0 0 1 0 0 1 1 1 0 0
+1 1 0 1 1 1 1 1 0 1 1 1 0 1 1 0 0 0 0 0 1
+0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0 0 1 0 0 0
+1 1 1 1 1 1 1 0 1 1 0 0 1 0 1 0 0 0 1 1 0
+1 0 0 0 0 0 1 0 0 1 1 1 1 1 0 1 0 1 1 0 0
+1 0 1 1 1 0 1 0 1 0 0 0 1 0 1 1 0 0 0 1 1
+1 0 1 1 1 0 1 0 1 1 0 0 0 1 1 1 1 1 0 0 0
+1 0 1 1 1 0 1 0 1 1 1 0 1 0 0 1 0 0 1 0 0
+1 0 0 0 0 0 1 0 1 1 0 0 1 1 0 0 1 1 1 0 0
+1 1 1 1 1 1 1 0 1 1 1 1 1 0 1 0 1 0 0 1 0
+= End of Listing 1 =
+
+The first line is information about the format (ASCII black/white
+bitmap). The second line gives the width and height of the image. The
+size of this QR-code is 21 but it can be anything in the set
+{17+4v,1<=v<=40}. Replacing the 0s with spaces and the 1s with Xs gets
+us a more readable representation of the QR-code:
+
+= Figure 1: "Hello World!" QR-code =
+
+X X X X X X X     X     X   X X X X X X X
+X           X   X     X     X           X
+X   X X X   X     X         X   X X X   X
+X   X X X   X   X     X     X   X X X   X
+X   X X X   X       X X X   X   X X X   X
+X           X   X X X   X   X           X
+X X X X X X X   X   X   X   X X X X X X X
+                    X X X                
+X X X X X   X X X X     X X   X   X   X  
+X X X X X     X   X     X X X X X X X   X
+X     X     X   X     X   X X     X X X  
+        X       X   X     X     X X X    
+X X   X X X X X   X X X   X X           X
+                X   X   X         X      
+X X X X X X X   X X     X   X       X X  
+X           X     X X X X X   X   X X    
+X   X X X   X   X       X   X X       X X
+X   X X X   X   X X       X X X X X      
+X   X X X   X   X X X   X     X     X    
+X           X   X X     X X     X X X    
+X X X X X X X   X X X X X   X   X     X  
+
+= End of Figure 1 =
+
+If this file was provided without a QR-code decoder, you can check the
+content of the QR-code by using the ZXing online decoder (2).
+
+(1) https://en.wikipedia.org/wiki/Netpbm
+(2) http://zxing.org/w/decode.jspx
+
+
+
+=== Patterns ===
+
+The first layer in the QR-code decoding stack is the shape recognition. It
+is a difficult and error-prone task. To ease the process of this step,
+regular fixed patterns are embedded within the image.
+
+The finder patterns and the timing patterns are present in all regular
+QR-codes; the number alignment patterns depends on the size of the
+QR-code. The first two are present in Figure 1 and Figure 2 help to
+locate them (the 0s which are part of the patterns have been put back).
+
+= Figure 2: QR-code patterns =
+
+X X X X X X X 0           0 X X X X X X X
+X 0 0 0 0 0 X 0           0 X 0 0 0 0 0 X
+X 0 X X X 0 X 0           0 X 0 X X X 0 X
+X 0 X X X 0 X 0           0 X 0 X X X 0 X
+X 0 X X X 0 X 0           0 X 0 X X X 0 X
+X 0 0 0 0 0 X 0           0 X 0 0 0 0 0 X
+X X X X X X X 0 X 0 X 0 X 0 X X X X X X X
+0 0 0 0 0 0 0 0           0 0 0 0 0 0 0 0
+            X
+            0
+            X
+            0
+            X
+0 0 0 0 0 0 0 0
+X X X X X X X 0
+X 0 0 0 0 0 X 0
+X 0 X X X 0 X 0
+X 0 X X X 0 X 0
+X 0 X X X 0 X 0
+X 0 0 0 0 0 X 0
+X X X X X X X 0
+
+= End of Figure 2 =
+
+== Finder patterns ==
+
+The most obvious patterns are the "finder patterns". They are located
+in the top-left, top-right and bottom-left corners. They are composed
+of a 3x3 full square within a 7x7 empty square and are separated from
+the remaining of the image by a 1-module wide white border.
+
+As their name suggest, they are used to locate a QR-code within a bigger
+image and to determine the orientation of the QR-code. Note that they
+do not extend with the version/size of the QR-code (their size remain
+of 7 modules).
+
+== Timing patterns ==
+
+The second kind of pattern is less outstanding: two lines of alternating
+modules. One line is the seventh row and the other is the seventh column
+(minus the finder patterns).
+
+They help infering the size of the modules. In the example, they are
+5-module long, but their length varies accordingly with the version/size
+of the QR-code.
+
+== Alignment patterns ==
+
+There are no alignment patterns in the example. They are made of a dark
+module within 5x5 empty square, without any border:
+
+= Figure 3: alignment pattern =
+X X X X X
+X 0 0 0 X
+X 0 X 0 X
+X 0 0 0 X
+X X X X X
+= End of Figure 3 =
+
+They are used to help the shape-recognition software align the modulus
+grid in bigger QR-codes. Their coordinates varies a bit accross the
+QR-code versions and are given in tables.
+
+
+
+=== Bibliography ===
+
+The information used in the design of this program and documentation come
+from Wikpedia (1), Wikiversity (2) (3) and the QR-code specification (4)
+(5). The last two URLs were found on Stack Overflow (5).
+
+Moreover, some step-by-step execution of the decoding process (printf()
+to display the internal state of the program and GIMP to go through the
+PBM files) helped understanding ambiguous information and fixing bugs.
+
+(1) https://en.wikipedia.org/wiki/QR-code
+(2) https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders
+(3) https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders/Additional_information
+(4) http://www.codeplex.com/Download?ProjectName=qrcodenet&DownloadId=284291
+(5) https://stackoverflow.com/questions/3710937/what-is-the-spec-for-formatting-data-in-qr-codes-i-can-not-find-it-anywhere
