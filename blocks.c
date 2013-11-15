@@ -28,11 +28,14 @@ static void get_block(scanner_t* scanner)
 	scanner->i = scanner->s-1;
 	scanner->j = scanner->s-1;
 
+
 	// NOTE: in a symbol, all the blocks have the same number of error
 	//       correction codewords but the first series of blocks can
 	//       have one data codeword less
 
 	byte nblocks = b[0]+ b[3];
+
+
 
 	// BEGIN read data
 	// the next section handles the inverleaving of data codewords
@@ -62,8 +65,10 @@ static void get_block(scanner_t* scanner)
 	// END read data
 
 
+
 	// the module pointers is now at the end of all the data and at
 	// the beginning of the interleaved error correction codewords
+
 
 
 	// BEGIN read correction
@@ -80,12 +85,14 @@ static void get_block(scanner_t* scanner)
 	// END read correction
 
 
+
 	// apply Reed-Solomon error correction
 	if (rs_correction(n_data+n_errwords, scanner->block_data, n_errwords) != 0)
 	{
 		fprintf(stderr, "Could not correct errors\n");
 		exit(1);
 	}
+
 
 	scanner->block_cur = cur+1;
 	scanner->block_curbyte = 0;
