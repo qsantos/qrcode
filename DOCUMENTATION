@@ -20,7 +20,7 @@ A QR-code is a square grid block of "modules". A module is a white or
 dark square block. They can be seen as individual pixels but will be
 usually represented as several pixels on a picture. The "version" of a
 QR-code is a number between 1 and 40 (included) which defines its size:
-the number of modulus on the side of a version 'v' QR-code is 17+4*v.
+the number of modules on the side of a version 'v' QR-code is 17+4*v.
 
 Examples of QR-codes can be found in the 'examples/' directory. These
 images have been generated using 'qrencode' version 4.3.2 available in
@@ -169,7 +169,7 @@ X 0 0 0 X
 X X X X X
 = End of Figure 3 =
 
-They are used to help the shape-recognition software align the modulus
+They are used to help the shape-recognition software align the module
 grid in bigger QR-codes. Their coordinates varies a bit accross the
 QR-code versions and are given in tables.
 
@@ -220,7 +220,7 @@ NOTE: the version information is only present from version 7 to 40
 
 The version information is just the version of the QR-code. It is
 directly encoded within the image to help the infering of the size of
-the moduli. The version takes 6 bits, plus 12 error correction bits. No
+the modules. The version takes 6 bits, plus 12 error correction bits. No
 masking is applied and the 18-bit long chain can be found in two locations
 as shown in Figure 5 for a version 8 QR-code.
 
@@ -251,6 +251,84 @@ X X X X X X X
 The previous figure shows a version information chain of
 001000010110111100b (bottom-to-top, right-to-left), which corresponds
 to the 6-bit number 001000b, for version 8, as expected.
+
+
+
+=== Masking ===
+
+The format information contains information about masking. This is
+an operation on the content modules which regularly swap some of
+them. By selecting the right masking out of the 8 available ones, an
+encoder is able to generate a QR-code which content does not contain
+a group of modules similar to a pattern (which would otherwise confuse
+shape-recognition).
+
+The masks are defined by an expression which depend on the row and the
+column of the current module. If this expression is equal to 0, then
+the current module is to be swapped.
+
+= Listing 2: The 8 masks =
+0  (i*j)%2 + (i*j)%3
+1  (i/2 + j/3)%2
+2  ((i*j)%3 + (i+j)%2)%2   ->  same as ((i*j)%3 + i+j)%2
+3  ((i*j)%2 + (i*j)%3)%2   ->  same as ((i*j)%3 + i*j)%2
+4  i%2
+5  (i+j)%2
+6  (i+j)%3
+7  j%3
+= End of Listing 2
+
+When encoding, each mask must be tested in order to find the best one.
+
+
+
+=== Codewords ===
+
+The remaining modules represent the content of the QR-code (data and its
+own error correction information). As a summary there are five items
+which are not content:
+  * finder patterns;
+  * timing patterns;
+  * alignment patterns;
+  * format information;
+  * version information.
+
+The content is made of codewords of 8 bits. Each bit correspond to
+one module. The bits will be accessed by order of significance (first
+accessed is the most significant bit in each codeword).
+
+Basically, the bits of content are arranged as follow. Starting from
+the bottom-right, access 8-module codewords from bottom to top in the
+following order:
+7 6
+5 4
+3 2
+1 0
+
+When the top of the image (row 0) is reached, got to the next (left)
+columns and go the same top to bottom:
+1 0
+3 2
+5 4
+7 6
+
+However, the areas without content are to be avoided, which will distort
+this nice rectangular-shape codeword to hideous monsters. The simplest
+way to find the right module to read or write a bit of content is to go
+"turtle-mode". We start at the bottom-right corner of the grid and,
+whenever the next bit of content is to be accessed, we do the following:
+
+= Listing 3: Content-finding turtle =
+if going from bottom-to-top:
+	go left or go    top-right depending on column parity
+else:
+	go left or go bottom-right depending on column parity
+iterate until a content module is found
+apply masking
+= End of Listing 3 =
+
+Note that, for the 6 left-most module columns, to "simplify" things,
+the parity is inversed (because of the vertical timing pattern).
 
 
 
