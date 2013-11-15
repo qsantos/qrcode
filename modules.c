@@ -109,7 +109,7 @@ void next_bit(scanner_t* scanner)
 	{
 		if ((j/2) % 2 == 0)
 		{
-			if (j % 2 == 0 || i >= scanner->s-1)
+			if (j % 2 == (j<6) || i >= scanner->s-1)
 			{
 				j--;
 			}
@@ -121,7 +121,7 @@ void next_bit(scanner_t* scanner)
 		}
 		else
 		{
-			if (j % 2 == 0 || i <= 0)
+			if (j % 2 == (j<6) || i <= 0)
 			{
 				j--;
 			}
