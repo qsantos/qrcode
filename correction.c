@@ -89,6 +89,18 @@ byte rs_calc_syndromes(poly_t* msg, poly_t* synd)
 	return ret;
 }
 
+void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd)
+{
+	memcpy(fsynd, synd, sizeof(poly_t));
+	for (size_t i = 0; i < pos->d; i++)
+	{
+		byte x = gf_exp[msg->d - pos->c[i]];
+		for (size_t i = 0; i < fsynd->d; i++)
+			fsynd->c[i] = gf_mul(fsynd->c[i], x) ^ fsynd->c[i+1];
+		fsynd->d--;
+	}
+}
+
 byte rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
 {
 	// find error locator polynomial with Berlekamp-Massey algorithm

@@ -12,6 +12,7 @@ struct poly
 };
 
 byte rs_calc_syndromes  (poly_t* msg, poly_t* synd);
+void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd);
 byte rs_find_error      (poly_t* msg, poly_t* synd, poly_t* pos);
 void rs_correct_errata  (poly_t* msg, poly_t* synd, poly_t* pos);
 
