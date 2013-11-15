@@ -390,6 +390,28 @@ Block 4: D35 D36 ... D45 D46 E67 E68 ... E88
 
 
 
+=== Error correction ===
+
+Note: this section only deals with the error correction for the content
+      blocks, not for the format or version information.
+
+The Reed-Solomon (RS) error correction algorithm is applied for each
+block. In the following section, we will consider a block as a polynomial
+over GF(2^8) (each 8-bit long codeword is a coefficient). Note that
+the gap in Listing 5 due to the blocks of different size is sicarded:
+the last blocks actually have a degree greater than the first ones.
+
+The overall procedure is to first compute "syndromes", which are elements
+of GF(2^8) containing information about the state of the block. There
+is one syndrome per error-correction codeword. These are then used to
+locate the errors, and then correct them.
+
+Note: errors can be either erasures (we know it has been corrupted)
+      and misreading (it changed without obvious clue it happened)
+      misreading costs twice as much as erasures to ccorect
+
+
+
 === Bibliography ===
 
 The information used in the design of this program and documentation come
