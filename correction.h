@@ -23,16 +23,14 @@
 
 typedef struct poly poly_t;
 
+// NOTE: for 'synd' and 'pos', the poly_t structure is used as an array and
+//       the 'd' parameter is actually the size of this array (the degree of
+//       a polynomial is the number of coefficients minus one)
 struct poly
 {
 	size_t d;    // degree
 	byte c[512]; // coefficients
 };
-
-byte rs_calc_syndromes  (poly_t* msg, poly_t* synd);
-void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd);
-byte rs_find_error      (poly_t* msg, poly_t* synd, poly_t* pos);
-void rs_correct_errata  (poly_t* msg, poly_t* synd, poly_t* pos);
 
 byte rs_correction(size_t n_data, byte* data, byte nsym);
 

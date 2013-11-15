@@ -20,6 +20,7 @@
 #define QRSCANNER_H
 
 #include <sys/types.h>
+
 typedef unsigned char byte;
 typedef struct scanner scanner_t;
 

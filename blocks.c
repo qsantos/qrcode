@@ -128,7 +128,7 @@ unsigned int get_bits(scanner_t* scanner, size_t n)
 	if (!scanner->block_cur)
 		get_block(scanner);
 
-	// this buffer handling is an abomination
+	// this bit-by-bit buffer reading is an abomination
 	unsigned int res = 0;
 	while (n--)
 	{

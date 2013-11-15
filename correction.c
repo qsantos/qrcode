@@ -27,8 +27,47 @@
 // error correction algorithms are inspired from
 // https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders
 
+
+
+// BEGIN local function prototypes
+
+static byte max(byte a, byte b);
+
+//
+// Galois Field operations
+//
+// init discrete logarithm lookup table
+static void gf_init();
+// element-wise operations
+static byte gf_mul(byte x, byte y);
+static byte gf_div(byte x, byte y);
+// polynomial-wise operations
+static void gf_poly_scale(poly_t* r, poly_t* p, byte x);
+static void gf_poly_add  (poly_t* dest, poly_t* p, poly_t* q);
+static void gf_poly_mul  (poly_t* dest, poly_t* p, poly_t* q);
+static byte gf_poly_eval (poly_t* p, byte x);
+
+//
+// Reed-Solomon auxiliary functions
+//
+static byte rs_calc_syndromes  (poly_t* msg, poly_t* synd);
+static void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd);
+static byte rs_find_error      (poly_t* msg, poly_t* synd, poly_t* pos);
+static void rs_fderivative     (poly_t* r, poly_t* p);
+static void rs_correct_errata  (poly_t* msg, poly_t* synd, poly_t* pos);
+
+// END local function prototypes
+
+
+
+
 static byte gf_exp[512] = {0};
 static byte gf_log[256] = {0};
+
+static byte max(byte a, byte b)
+{
+	return a >= b ? a : b;
+}
 
 static void gf_init()
 {
@@ -66,10 +105,6 @@ static void gf_poly_scale(poly_t* r, poly_t* p, byte x)
 	r->d = p->d;
 }
 
-static byte max(byte a, byte b)
-{
-	return a >= b ? a : b;
-}
 static void gf_poly_add(poly_t* dest, poly_t* p, poly_t* q)
 {
 	poly_t r;
@@ -101,7 +136,7 @@ static byte gf_poly_eval(poly_t* p, byte x)
 	return y;
 }
 
-byte rs_calc_syndromes(poly_t* msg, poly_t* synd)
+static byte rs_calc_syndromes(poly_t* msg, poly_t* synd)
 {
 	gf_init();
 	byte ret = 0;
@@ -111,7 +146,7 @@ byte rs_calc_syndromes(poly_t* msg, poly_t* synd)
 	return ret;
 }
 
-void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd)
+static void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd)
 {
 	memcpy(fsynd, synd, sizeof(poly_t));
 	for (size_t i = 0; i < pos->d; i++)
@@ -123,7 +158,7 @@ void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* fsynd)
 	}
 }
 
-byte rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
+static byte rs_find_error(poly_t* msg, poly_t* synd, poly_t* pos)
 {
 	// find error locator polynomial with Berlekamp-Massey algorithm
 	poly_t err = { 0, {1} };
@@ -173,7 +208,8 @@ static void rs_fderivative(poly_t* r, poly_t* p)
 		r->c[i/2] = p->c[i];
 	r->d = p->d/2;
 }
-void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos)
+
+static void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos)
 {
 	// calculate error locator polynomial
 	poly_t q = { 0, {1} };
