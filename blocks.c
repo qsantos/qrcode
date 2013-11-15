@@ -62,14 +62,15 @@ static void get_block(scanner_t* scanner)
 
 	// number of error correction codewords
 	// (same for both types of blocks)
-	n = b[1] - b[2];
-	for (size_t i = 0; i < n-1; i++)
+	n = b[1] - b[2] - 1;
+	for (size_t i = 0; i < n; i++)
 	{
 		scanner->block_data[ndata+i] = get_codeword(scanner);
 
 		// skip the interleaved codewords
 		skip_bits(scanner, (b[0]+b[3]-1) * 8);
 	}
+	scanner->block_data[ndata+n] = get_codeword(scanner);
 
 	scanner->block_cur = cur+1;
 	scanner->block_curbyte = 0;
