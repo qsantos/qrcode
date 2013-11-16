@@ -23,6 +23,9 @@ extern const unsigned char pattern_finder[7][7];
 
 extern const char* charset_alpha;
 
+extern const unsigned char version_range[41];
+extern const unsigned char lenbits[5][3]; // [encoding][version range]
+
 extern const unsigned long bch_format_gen;
 extern const unsigned long bch_format_mask;
 extern const unsigned long bch_version_gen;

@@ -29,6 +29,22 @@ const unsigned char pattern_finder[7][7] =
 
 const char* charset_alpha = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
+const unsigned char version_range[41] =
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+};
+
+const unsigned char lenbits[5][3] = // [encoding][version range]
+{
+	{ 0 },
+	{ 10, 12, 14, }, // numeric
+	{  9, 11, 13, }, // alphanumeric
+	{ 0 },
+	{  8, 16, 16, }, // Shift JIS
+};
+
 const unsigned long bch_format_gen   = 0x537;
 const unsigned long bch_format_mask  = 0x5412;
 const unsigned long bch_version_gen  = 0x1f25;

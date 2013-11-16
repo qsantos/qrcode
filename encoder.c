@@ -28,45 +28,55 @@ typedef struct encoded encoded_t;
 
 struct encoded
 {
-	size_t a; // available memory (bytes)
-	size_t n; // used memory (bytes)
-	char   b; // available bits in last byte
-	char*  d; // data
+	int   a; // available memory (bytes)
+	int   n; // used memory (bytes)
+	char  b; // available bits in last byte
+	char* d; // data
+
+	int vr; // version range 0 = 1-9, 1 = 10-26, 2 = 27-40
 };
 
+
+static void push_bit    (encoded_t* encoded, char bit);
+static void push_bits   (encoded_t* encoded, size_t n, int v);
+static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str);
+static size_t encode_in_range(encoded_t* encoded, const char* data);
 
 static void push_bit(encoded_t* encoded, char bit)
 {
 	if (encoded->b == 0)
 	{
+		encoded->n++;
 		if (encoded->n >= encoded->a)
 		{
 			encoded->a = encoded->a ? 2*encoded->a : 1;
 			encoded->d = realloc(encoded->d, encoded->a);
 		}
-		encoded->n++;
 		encoded->b = 8;
 	}
 	encoded->d[encoded->n] |= bit << (encoded->b-1);
 	encoded->b--;
 }
+
 static void push_bits(encoded_t* encoded, size_t n, int v)
 {
 	printf("Pushing %#x (%zu)\n", v, n);
+	if (!n) return;
 	while (--n)
 		push_bit(encoded, v>>n);
 }
+
 #define D(I) ((str[I]) - '0')
 #define A(I) (strchr(charset_alpha, str[I]) - charset_alpha)
 static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 {
-	if (!n)
-		return;
+	if (!n) return;
 
-	push_bits(encoded, 4, enc);
+	push_bits(encoded, 4, enc); // mode
+	if (enc)
+		push_bits(encoded, lenbits[enc][encoded->vr], n); // length
 	if (enc == 1)
 	{
-		push_bits(encoded, 10, n);
 		for (; n>=3; n-=3, str+=3)
 		{
 			unsigned int c = (D(0)*10 + D(1))*10 + D(2);
@@ -85,7 +95,6 @@ static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 	}
 	else if (enc == 2)
 	{
-		push_bits(encoded, 9, n);
 		for (; n>=2; n-=2, str+=2)
 		{
 			unsigned int c = A(0)*45 + A(1);
@@ -99,7 +108,6 @@ static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 	}
 	else if (enc == 4)
 	{
-		push_bits(encoded, 8, n);
 		for (; n; n--, str++)
 			push_bits(encoded, 8, *str);
 	}
@@ -108,10 +116,12 @@ static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 		exit(1);
 	}
 }
-#define PUSH(E,N) {push_segment(&encoded,E,N,data); data += (N);}
-void qrc_encode(const char* data)
+
+#define PUSH(E,N) {push_segment(encoded,E,N,data); data += (N);}
+static size_t encode_in_range(encoded_t* encoded, const char* data)
 {
-	encoded_t encoded = { 0, 0, 0, NULL };
+	encoded->n = -1;
+	encoded->b = 0;
 
 	size_t n_numer = 0;
 	size_t n_alpha = 0;
@@ -160,5 +170,15 @@ void qrc_encode(const char* data)
 		n_byte++;
 	}
 	PUSH(4, n_byte)
-	push_bits(&encoded, 4, 0);
+	push_bits(encoded, 4, 0);
+	return encoded->n;
+}
+
+void qrc_encode(const char* data)
+{
+	encoded_t encoded;
+	encoded.a = 0;
+	encoded.d = NULL;
+	encoded.vr = 0;
+	encode_in_range(&encoded, data);
 }
