@@ -33,7 +33,8 @@ struct encoded
 	char  b; // available bits in last byte
 	char* d; // data
 
-	int vr; // version range 0 = 1-9, 1 = 10-26, 2 = 27-40
+	size_t vr; // version range 0 = 1-9, 1 = 10-26, 2 = 27-40
+	size_t v;  // version
 };
 
 
@@ -173,11 +174,41 @@ static void encode_in_range(encoded_t* encoded, const char* data)
 	push_bits(encoded, 4, 0);
 }
 
-void qrc_encode(const char* data)
+static int size_to_version(int ecl, size_t n)
+{
+	for (size_t v = 1; v <= 40; v++)
+	{
+		const unsigned char* b = block_sizes[4*v+ecl];
+		size_t c = b[0]*b[2] + b[3]*b[5];
+		if (n <= c)
+			return v;
+	}
+	return -1;
+}
+
+void qrc_encode(int ecl, const char* data)
 {
 	encoded_t encoded;
 	encoded.a = 0;
 	encoded.d = NULL;
 	encoded.vr = 0;
-	encode_in_range(&encoded, data);
+	while (1)
+	{
+		encode_in_range(&encoded, data);
+		int v = size_to_version(ecl, encoded.n);
+		if (v < 0)
+		{
+			fprintf(stderr, "The data cannot fit in any QR-code\n");
+			exit(1);
+		}
+
+		size_t vr = version_range[v];
+		if (vr == encoded.vr)
+		{
+			encoded.v = v;
+			break;
+		}
+		encoded.vr = vr;
+	}
+	printf("Version %zu selected\n", encoded.v);
 }

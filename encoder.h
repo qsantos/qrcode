@@ -19,6 +19,6 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-void qrc_encode(const char* data);
+void qrc_encode(int ecl, const char* data);
 
 #endif
