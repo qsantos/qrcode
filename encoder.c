@@ -52,6 +52,11 @@ static void push_bit(encoded_t* encoded, char bit)
 		{
 			encoded->a = encoded->a ? 2*encoded->a : 1;
 			encoded->d = realloc(encoded->d, encoded->a);
+			if (encoded->d == NULL)
+			{
+				fprintf(stderr, "Could not allocate memory for encoding stream\n");
+				exit(1);
+			}
 		}
 		encoded->b = 8;
 	}
