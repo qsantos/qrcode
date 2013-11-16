@@ -67,14 +67,14 @@ void qrc_decode(scanner_t* scanner)
 	if (v >= 7)
 	{
 		int version1 = 0;
-		for (size_t i = 0; i < 6; i++)
-			for (size_t j = 0; j < 3; j++)
+		for (int i = 5; i >= 0; i--)
+			for (int j = 2; j >= 0; j--)
 				version1 = 2*version1 + P(i, s-11+j);
 		version1 = bch_decode(bch_version_gen, version1 ^ bch_version_mask);
 
 		int version2 = 0;
-		for (size_t i = 0; i < 6; i++)
-			for (size_t j = 0; j < 3; j++)
+		for (int i = 5; i >= 0; i--)
+			for (int j = 2; j >= 0; j--)
 				version2 = 2*version2 + P(i, s-11+j);
 		version2 = bch_decode(bch_version_gen, version2 ^ bch_version_mask);
 
