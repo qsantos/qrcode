@@ -22,6 +22,7 @@
 
 #include "blocks.h"
 #include "bch.h"
+#include "data.h"
 
 
 
@@ -29,29 +30,16 @@
 
 
 
-static void check_finder(scanner_t* scanner, size_t i, size_t j);
-
 static void check_finder(scanner_t* scanner, size_t i, size_t j)
 {
-	static const char mask[7][7] =
-	{
-		{ 1,1,1,1,1,1,1, },
-		{ 1,0,0,0,0,0,1, },
-		{ 1,0,1,1,1,0,1, },
-		{ 1,0,1,1,1,0,1, },
-		{ 1,0,1,1,1,0,1, },
-		{ 1,0,0,0,0,0,1, },
-		{ 1,1,1,1,1,1,1, },
-	};
 	for (size_t ki = 0; ki < 7; ki++)
 	for (size_t kj = 0; kj < 7; kj++)
-		if (P(i+ki,j+kj) != mask[ki][kj])
+		if (P(i+ki,j+kj) != pattern_finder[ki][kj])
 		{
 			fprintf(stderr, "Invalid finder at (%zu,%zu)\n", i, j);
 			exit(1);
 		}
 }
-
 void qrc_decode(scanner_t* scanner)
 {
 	// size
@@ -82,13 +70,13 @@ void qrc_decode(scanner_t* scanner)
 		for (size_t i = 0; i < 6; i++)
 			for (size_t j = 0; j < 3; j++)
 				version1 = 2*version1 + P(i, s-11+j);
-		version1 = bch_decode(0x1f25, version1);
+		version1 = bch_decode(bch_version_gen, version1 ^ bch_version_mask);
 
 		int version2 = 0;
 		for (size_t i = 0; i < 6; i++)
 			for (size_t j = 0; j < 3; j++)
 				version2 = 2*version2 + P(i, s-11+j);
-		version2 = bch_decode(0x1f25, version2);
+		version2 = bch_decode(bch_version_gen, version2 ^ bch_version_mask);
 
 		if ((version1 < 0 && version2 < 0) || version1 != version2)
 		{
@@ -112,14 +100,14 @@ void qrc_decode(scanner_t* scanner)
 	format1 = 2*format1 + P(7,8);
 	for (int i = 5; i >= 0; i--)
 		format1 = 2*format1 + P(i,8);
-	format1 = bch_decode(0x537, format1 ^ 0x5412);
+	format1 = bch_decode(bch_format_gen, format1 ^ bch_format_mask);
 
 	bch_t format2 = 0;
 	for (int i = 1; i <= 7; i++)
 		format2 = 2*format2 + P(s-i,8);
 	for (int i = 8; i >= 1; i--)
 		format2 = 2*format2 + P(8,s-i);
-	format2 = bch_decode(0x537, format2 ^ 0x5412);
+	format2 = bch_decode(bch_format_gen, format2 ^ bch_format_mask);
 
 	if ((format1 < 0 && format2 < 0) || format1 != format2)
 	{
@@ -128,8 +116,8 @@ void qrc_decode(scanner_t* scanner)
 	}
 
 	int format = format1 & format2;
-	scanner->m = format & 0x7;      // mask
-	byte ECLs[] = { 1, 0, 3, 2 };   // yes, absurd (see Table 25)
+	scanner->m = format & 0x7; // mask
+	static const byte ECLs[] = { 1, 0, 3, 2 }; // yes, absurd (see Table 25)
 	scanner->c = ECLs[format >> 3]; // Error Correction Level
 
 	if (scanner->verbosity > 0)
@@ -178,17 +166,16 @@ void qrc_decode(scanner_t* scanner)
 			else if (v >= 10) lenbits = 11;
 			size_t len = get_bits(scanner, lenbits);
 
-			static const char* map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 			for (; len >= 2; len-=2)
 			{
 				unsigned int c = get_bits(scanner, 11);
-				printf("%c", map[c/45]);
-				printf("%c", map[c%45]);
+				printf("%c", charset_alpha[c/45]);
+				printf("%c", charset_alpha[c%45]);
 			}
 			if (len == 1)
 			{
 				unsigned int c = get_bits(scanner, 6);
-				printf("%c", map[c]);
+				printf("%c", charset_alpha[c]);
 			}
 		}
 		else if (enc == 4) // Shift JIS

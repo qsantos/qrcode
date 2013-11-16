@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "data.h"
 #include "modules.h"
 #include "rs.h"
 
@@ -35,11 +36,7 @@ static void get_block(scanner_t* scanner);
 static void get_block(scanner_t* scanner)
 {
 	// get block information
-	static const byte blocks[160][7] =
-	{
-#include "blocksizes.h"
-	};
-	const byte* b = blocks[4*(scanner->v-1) + scanner->c];
+	const byte* b = block_sizes[4*(scanner->v-1) + scanner->c];
 
 	// current block
 	size_t cur = scanner->block_cur;

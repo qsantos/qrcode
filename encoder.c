@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "data.h"
+
 typedef struct encoded encoded_t;
 
 struct encoded
@@ -32,7 +34,6 @@ struct encoded
 	char*  d; // data
 };
 
-static const char* charset_alpha = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
 static void push_bit(encoded_t* encoded, char bit)
 {

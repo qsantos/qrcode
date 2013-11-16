@@ -16,6 +16,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
+const unsigned char pattern_finder[7][7] =
+{
+	{ 1,1,1,1,1,1,1, },
+	{ 1,0,0,0,0,0,1, },
+	{ 1,0,1,1,1,0,1, },
+	{ 1,0,1,1,1,0,1, },
+	{ 1,0,1,1,1,0,1, },
+	{ 1,0,0,0,0,0,1, },
+	{ 1,1,1,1,1,1,1, },
+};
+
+const char* charset_alpha = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+
+const unsigned long bch_format_gen   = 0x537;
+const unsigned long bch_format_mask  = 0x5412;
+const unsigned long bch_version_gen  = 0x1f25;
+const unsigned long bch_version_mask = 0x0;
+
+const unsigned char block_sizes[160][7] =
+{
 	// n_blocks, block_words, block_data, ...
 	// V1
 	{ 1, 26, 19,   0, }, // L
@@ -217,3 +237,4 @@
 	{18, 75, 47,  31, 76, 48,  0, },
 	{34, 54, 24,  34, 55, 25,  0, },
 	{20, 45, 25,  61, 46, 16,  0, },
+};
