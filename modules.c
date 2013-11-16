@@ -118,7 +118,7 @@ static byte mask(scanner_t* scanner, byte bit)
 	case 5: bit ^= 0 == (i*j)%2 + (i*j)%3;   break;
 	case 6: bit ^= 0 == ((i*j)%2+(i*j)%3)%2; break;
 	case 7: bit ^= 0 == ((i*j)%3+(i+j)%2)%2; break;
-	default: return 0;
+	default: return bit;
 	}
 	return bit;
 }
