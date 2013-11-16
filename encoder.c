@@ -23,10 +23,11 @@
 #include <string.h>
 
 #include "data.h"
+#include "blocks.h"
 
-typedef struct encoded encoded_t;
+typedef struct stream stream_t;
 
-struct encoded
+struct stream
 {
 	int   a; // available memory (bytes)
 	int   n; // used memory (bytes)
@@ -34,69 +35,68 @@ struct encoded
 	char* d; // data
 
 	size_t vr; // version range 0 = 1-9, 1 = 10-26, 2 = 27-40
-	size_t v;  // version
 };
 
 
-static void push_bit    (encoded_t* encoded, char bit);
-static void push_bits   (encoded_t* encoded, size_t n, int v);
-static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str);
-static void encode_in_range(encoded_t* encoded, const char* data);
+static void push_bit    (stream_t* stream, char bit);
+static void push_bits   (stream_t* stream, size_t n, int v);
+static void push_segment(stream_t* stream, int enc, size_t n, const char* str);
+static void encode_in_range(stream_t* stream, const char* data);
 
-static void push_bit(encoded_t* encoded, char bit)
+static void push_bit(stream_t* stream, char bit)
 {
-	if (encoded->b == 0)
+	if (stream->b == 0)
 	{
-		encoded->n++;
-		if (encoded->n >= encoded->a)
+		stream->n++;
+		if (stream->n >= stream->a)
 		{
-			encoded->a = encoded->a ? 2*encoded->a : 1;
-			encoded->d = realloc(encoded->d, encoded->a);
-			if (encoded->d == NULL)
+			stream->a = stream->a ? 2*stream->a : 1;
+			stream->d = realloc(stream->d, stream->a);
+			if (stream->d == NULL)
 			{
 				fprintf(stderr, "Could not allocate memory for encoding stream\n");
 				exit(1);
 			}
 		}
-		encoded->b = 8;
+		stream->b = 8;
 	}
-	encoded->d[encoded->n] |= bit << (encoded->b-1);
-	encoded->b--;
+	stream->d[stream->n] |= bit << (stream->b-1);
+	stream->b--;
 }
 
-static void push_bits(encoded_t* encoded, size_t n, int v)
+static void push_bits(stream_t* stream, size_t n, int v)
 {
 	printf("Pushing %#x (%zu)\n", v, n);
 	if (!n) return;
 	while (--n)
-		push_bit(encoded, v>>n);
+		push_bit(stream, v>>n);
 }
 
 #define D(I) ((str[I]) - '0')
 #define A(I) (strchr(charset_alpha, str[I]) - charset_alpha)
-static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
+static void push_segment(stream_t* stream, int enc, size_t n, const char* str)
 {
 	if (!n) return;
 
-	push_bits(encoded, 4, enc); // mode
+	push_bits(stream, 4, enc); // mode
 	if (enc)
-		push_bits(encoded, lenbits[enc][encoded->vr], n); // length
+		push_bits(stream, lenbits[enc][stream->vr], n); // length
 	if (enc == 1)
 	{
 		for (; n>=3; n-=3, str+=3)
 		{
 			unsigned int c = (D(0)*10 + D(1))*10 + D(2);
-			push_bits(encoded, 10, c);
+			push_bits(stream, 10, c);
 		}
 		if (n == 2)
 		{
 			unsigned int c = D(0)*10 + D(1);
-			push_bits(encoded, 7, c);
+			push_bits(stream, 7, c);
 		}
 		else if (n == 1)
 		{
 			unsigned int c = D(0);
-			push_bits(encoded, 4, c);
+			push_bits(stream, 4, c);
 		}
 	}
 	else if (enc == 2)
@@ -104,18 +104,18 @@ static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 		for (; n>=2; n-=2, str+=2)
 		{
 			unsigned int c = A(0)*45 + A(1);
-			push_bits(encoded, 11, c);
+			push_bits(stream, 11, c);
 		}
 		if (n == 1)
 		{
 			unsigned int c = A(0);
-			push_bits(encoded, 5, c);
+			push_bits(stream, 5, c);
 		}
 	}
 	else if (enc == 4)
 	{
 		for (; n; n--, str++)
-			push_bits(encoded, 8, *str);
+			push_bits(stream, 8, *str);
 	}
 	else
 	{
@@ -123,11 +123,11 @@ static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 	}
 }
 
-#define PUSH(E,N) {push_segment(encoded,E,N,data); data += (N);}
-static void encode_in_range(encoded_t* encoded, const char* data)
+#define PUSH(E,N) {push_segment(stream,E,N,data); data += (N);}
+static void encode_in_range(stream_t* stream, const char* data)
 {
-	encoded->n = -1;
-	encoded->b = 0;
+	stream->n = -1;
+	stream->b = 0;
 
 	size_t n_numer = 0;
 	size_t n_alpha = 0;
@@ -176,14 +176,14 @@ static void encode_in_range(encoded_t* encoded, const char* data)
 		n_byte++;
 	}
 	PUSH(4, n_byte)
-	push_bits(encoded, 4, 0);
+	push_bits(stream, 4, 0);
 }
 
 static int size_to_version(int ecl, size_t n)
 {
 	for (size_t v = 1; v <= 40; v++)
 	{
-		const unsigned char* b = block_sizes[4*v+ecl];
+		const byte* b = block_sizes[4*v+ecl];
 		size_t c = b[0]*b[2] + b[3]*b[5];
 		if (n <= c)
 			return v;
@@ -193,14 +193,15 @@ static int size_to_version(int ecl, size_t n)
 
 void qrc_encode(int ecl, const char* data)
 {
-	encoded_t encoded;
-	encoded.a = 0;
-	encoded.d = NULL;
-	encoded.vr = 0;
+	stream_t stream;
+	stream.a = 0;
+	stream.d = NULL;
+	stream.vr = 0;
+	int v;
 	while (1)
 	{
-		encode_in_range(&encoded, data);
-		int v = size_to_version(ecl, encoded.n);
+		encode_in_range(&stream, data);
+		v = size_to_version(ecl, stream.n);
 		if (v < 0)
 		{
 			fprintf(stderr, "The data cannot fit in any QR-code\n");
@@ -208,12 +209,20 @@ void qrc_encode(int ecl, const char* data)
 		}
 
 		size_t vr = version_range[v];
-		if (vr == encoded.vr)
-		{
-			encoded.v = v;
+		if (vr == stream.vr)
 			break;
-		}
-		encoded.vr = vr;
+		stream.vr = vr;
 	}
-	printf("Version %zu selected\n", encoded.v);
+	printf("Version %i selected\n", v);
+
+	size_t s = 17 + 4*v;
+	byte* d = (byte*) malloc(s*s);
+	if (d == NULL)
+	{
+		fprintf(stderr, "Could not allocate image\n");
+		exit(1);
+	}
+
+	scanner_t scanner = {d, s, v, ecl, 0, 0, 0, 0, 0, {0}, 0, 0, 0};
+	put_bits(&scanner, stream.n, stream.d);
 }

@@ -146,3 +146,10 @@ unsigned int get_bits(scanner_t* scanner, size_t n)
 	}
 	return res;
 }
+
+void put_bits(scanner_t* scanner, size_t n, const char* stream)
+{
+	(void) scanner;
+	(void) n;
+	(void) stream;
+}
