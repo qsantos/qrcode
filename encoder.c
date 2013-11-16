@@ -40,7 +40,7 @@ struct encoded
 static void push_bit    (encoded_t* encoded, char bit);
 static void push_bits   (encoded_t* encoded, size_t n, int v);
 static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str);
-static size_t encode_in_range(encoded_t* encoded, const char* data);
+static void encode_in_range(encoded_t* encoded, const char* data);
 
 static void push_bit(encoded_t* encoded, char bit)
 {
@@ -118,7 +118,7 @@ static void push_segment(encoded_t* encoded, int enc, size_t n, const char* str)
 }
 
 #define PUSH(E,N) {push_segment(encoded,E,N,data); data += (N);}
-static size_t encode_in_range(encoded_t* encoded, const char* data)
+static void encode_in_range(encoded_t* encoded, const char* data)
 {
 	encoded->n = -1;
 	encoded->b = 0;
@@ -171,7 +171,6 @@ static size_t encode_in_range(encoded_t* encoded, const char* data)
 	}
 	PUSH(4, n_byte)
 	push_bits(encoded, 4, 0);
-	return encoded->n;
 }
 
 void qrc_encode(const char* data)
