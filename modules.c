@@ -190,6 +190,6 @@ void put_codeword(scanner_t* scanner, byte w)
 		byte bit = (w>>i) & 1;
 		next_bit(scanner);
 
-		P(scanner->i, scanner->j) = mask(scanner, bit);
+		P(scanner->i, scanner->j) = bit;
 	}
 }
