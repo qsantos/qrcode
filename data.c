@@ -50,9 +50,10 @@ const unsigned long bch_format_mask  = 0x5412;
 const unsigned long bch_version_gen  = 0x1f25;
 const unsigned long bch_version_mask = 0x0;
 
-const unsigned char block_sizes[160][6] =
+const unsigned char block_sizes[164][6] =
 {
 	// n_blocks, block_words, block_data, ...
+	{0}, {0}, {0}, {0},
 	// V1
 	{ 1, 26, 19,   0,  0,  0 }, // L
 	{ 1, 26, 16,   0,  0,  0 }, // M

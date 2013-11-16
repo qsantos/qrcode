@@ -36,7 +36,7 @@ static void get_block(scanner_t* scanner);
 static void get_block(scanner_t* scanner)
 {
 	// get block information
-	const byte* b = block_sizes[4*(scanner->v-1) + scanner->c];
+	const byte* b = block_sizes[4*scanner->v + scanner->c];
 
 	// current block
 	size_t cur = scanner->block_cur;

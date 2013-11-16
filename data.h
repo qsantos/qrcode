@@ -48,6 +48,6 @@ extern const unsigned long bch_version_mask;
 // D = number of blocks of the second kind
 // E = number of codewords in each of these blocks
 // F = number of data codewords in each of these blocks
-extern const unsigned char block_sizes[160][6];
+extern const unsigned char block_sizes[164][6];
 
 #endif
