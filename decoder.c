@@ -128,6 +128,7 @@ void qrc_decode(scanner_t* scanner)
 	while (1)
 	{
 		byte enc = get_bits(scanner, 4);
+		size_t len = get_bits(scanner, lenbits[enc][version_range[v]]);
 
 		if (enc == 0) // END
 		{
@@ -135,11 +136,6 @@ void qrc_decode(scanner_t* scanner)
 		}
 		else if (enc == 1) // numeric
 		{
-			size_t lenbits = 10;
-			if (v >= 27) lenbits = 14;
-			else if (v >= 10) lenbits = 12;
-			size_t len = get_bits(scanner, lenbits);
-
 			for (; len>=3; len-=3)
 			{
 				unsigned int c = get_bits(scanner, 10);
@@ -161,11 +157,6 @@ void qrc_decode(scanner_t* scanner)
 		}
 		else if (enc == 2) // alphanumeric
 		{
-			size_t lenbits = 9;
-			if (v >= 27) lenbits = 13;
-			else if (v >= 10) lenbits = 11;
-			size_t len = get_bits(scanner, lenbits);
-
 			for (; len >= 2; len-=2)
 			{
 				unsigned int c = get_bits(scanner, 11);
@@ -180,10 +171,6 @@ void qrc_decode(scanner_t* scanner)
 		}
 		else if (enc == 4) // Shift JIS
 		{
-			size_t lenbits = 8;
-			if (v >= 10) lenbits = 16;
-			size_t len = get_bits(scanner, lenbits);
-
 			for (size_t i = 0; i < len; i++)
 			{
 				byte c = get_bits(scanner, 8);
