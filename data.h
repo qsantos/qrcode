@@ -31,6 +31,6 @@ extern const unsigned long bch_format_mask;
 extern const unsigned long bch_version_gen;
 extern const unsigned long bch_version_mask;
 
-extern const unsigned char block_sizes[160][7];
+extern const unsigned char block_sizes[160][6];
 
 #endif
