@@ -155,6 +155,7 @@ void rs_encode(size_t n_data, byte* data, byte n_sym)
 
 	byte old[512];
 	memcpy(old, data, n_data);
+	memset(data+n_data, 0, n_sym);
 
 	for (size_t i = 0; i < n_data; i++)
 	{
