@@ -34,6 +34,12 @@ extern const char* charset_alpha;
 // version to version range translation
 extern const unsigned char version_range[41];
 
+// Error Correction Level is handled as L..H = 0..3
+// but they are coded as 1, 0, 3, 2
+// yes, it is absurd, but see Table 25
+extern const unsigned char code_to_ecl[4];
+extern const unsigned char ecl_to_code[4];
+
 // number of bits used to encode the segment length
 extern const unsigned char lenbits[5][3]; // [encoding][version range]
 

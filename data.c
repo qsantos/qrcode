@@ -45,6 +45,10 @@ const unsigned char version_range[41] =
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 };
 
+// yeah, an this is just a double-permutation
+const unsigned char code_to_ecl[4] = { 1, 0, 3, 2 };
+const unsigned char ecl_to_code[4] = { 1, 0, 3, 2 };
+
 const unsigned char lenbits[5][3] = // [encoding][version range]
 {
 	{ 0 },
