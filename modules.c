@@ -160,8 +160,8 @@ void put_codeword(scanner_t* scanner, byte w)
 	for (int i = 7; i >= 0; i--)
 	{
 		byte bit = (w>>i) & 1;
-		next_bit(scanner);
 
 		P(scanner->i, scanner->j) = bit;
+		next_bit(scanner);
 	}
 }
