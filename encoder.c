@@ -66,17 +66,21 @@ static void push_bit(stream_t* stream, char bit)
 				exit(1);
 			}
 		}
+		stream->d[stream->n] = 0;
 		stream->b = 8;
 	}
-	stream->d[stream->n] |= bit << (stream->b-1);
 	stream->b--;
+	stream->d[stream->n] |= bit << stream->b;
 }
 
 static void push_bits(stream_t* stream, size_t n, int v)
 {
 	if (!n) return;
-	while (--n)
-		push_bit(stream, v>>n);
+	while (n)
+	{
+		n--;
+		push_bit(stream, (v>>n) & 1);
+	}
 }
 
 #define D(I) ((str[I]) - '0')
