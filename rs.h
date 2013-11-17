@@ -32,6 +32,7 @@ struct poly
 	byte c[512]; // coefficients
 };
 
+void rs_encode    (size_t n_data, byte* data, byte nsym);
 byte rs_correction(size_t n_data, byte* data, byte nsym);
 
 #endif

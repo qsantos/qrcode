@@ -136,6 +136,36 @@ static byte gf_poly_eval(poly_t* p, byte x)
 	return y;
 }
 
+static void rs_generator_poly(poly_t* g, byte nsym)
+{
+	gf_init();
+	g->d = 0;
+	g->c[0] = 1;
+	for (size_t i = 0; i < nsym; i++)
+	{
+		poly_t tmp = { 1, {1, gf_exp[i]} };
+		gf_poly_mul(g, g, &tmp);
+	}
+}
+
+void rs_encode(size_t n_data, byte* data, byte nsym)
+{
+	poly_t gen;
+	rs_generator_poly(&gen, nsym);
+
+	byte old[512];
+	memcpy(old, data, n_data);
+
+	for (size_t i = 0; i < n_data; i++)
+	{
+		byte coef = data[i];
+		if (coef)
+			for (size_t j = 0; j <= gen.d; j++)
+				data[i+j] ^= gf_mul(gen.c[j], coef);
+	}
+	memcpy(data, old, n_data);
+}
+
 static byte rs_calc_syndromes(poly_t* msg, poly_t* synd)
 {
 	gf_init();
