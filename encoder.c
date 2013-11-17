@@ -289,6 +289,13 @@ void qrc_encode(int ecl, const char* data)
 	set_finder(scanner, s-7, 0);
 	set_finder(scanner, 0, s-7);
 
+	// timing patterns
+	for (size_t i = 8; i < s-8; i += 2)
+	{
+		P(i, 6) = 1;
+		P(6, i) = 1;
+	}
+
 	// alignment patterns
 	const byte* xy = pattern_alignment_pos[v];
 	for (const byte* a = xy; *a; a++)
