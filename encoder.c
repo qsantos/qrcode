@@ -188,6 +188,8 @@ static void encode_in_range(stream_t* stream, const char* data)
 	}
 	PUSH(4, n_byte)
 	push_bits(stream, 4, 0);
+	push_bits(stream, 0, stream->b);
+	stream->n++;
 }
 
 static int size_to_version(int ecl, size_t n)
