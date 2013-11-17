@@ -24,8 +24,7 @@
 
 
 
-static int  is_data (scanner_t* scanner, size_t i, size_t j);
-static byte mask    (scanner_t* scanner, byte bit);
+static int  is_data(scanner_t* scanner, size_t i, size_t j);
 
 static int is_data(scanner_t* scanner, size_t i, size_t j)
 {
@@ -104,25 +103,6 @@ static int is_data(scanner_t* scanner, size_t i, size_t j)
 	return !(coll_x && coll_y);
 }
 
-static byte mask(scanner_t* scanner, byte bit)
-{
-	size_t i = scanner->i;
-	size_t j = scanner->j;
-	switch (scanner->m)
-	{
-	case 0: bit ^= 0 == (i+j)%2;             break;
-	case 1: bit ^= 0 == i%2;                 break;
-	case 2: bit ^= 0 == j%3;                 break;
-	case 3: bit ^= 0 == (i+j)%3;             break;
-	case 4: bit ^= 0 == (i/2+j/3)%2;         break;
-	case 5: bit ^= 0 == (i*j)%2 + (i*j)%3;   break;
-	case 6: bit ^= 0 == ((i*j)%2+(i*j)%3)%2; break;
-	case 7: bit ^= 0 == ((i*j)%3+(i+j)%2)%2; break;
-	default: return bit;
-	}
-	return bit;
-}
-
 void next_bit(scanner_t* scanner)
 {
 	size_t i = scanner->i;
@@ -168,15 +148,49 @@ void skip_bits(scanner_t* scanner, size_t n)
 		next_bit(scanner);
 }
 
+byte mask(byte m, size_t i, size_t j)
+{
+	switch (m)
+	{
+	case 0: return 0 == (i+j)%2;
+	case 1: return 0 == i%2;
+	case 2: return 0 == j%3;
+	case 3: return 0 == (i+j)%3;
+	case 4: return 0 == (i/2+j/3)%2;
+	case 5: return 0 == (i*j)%2 + (i*j)%3;
+	case 6: return 0 == ((i*j)%2+(i*j)%3)%2;
+	case 7: return 0 == ((i*j)%3+(i+j)%2)%2;
+	default: return 0;
+	}
+}
+
+int mask_grade(scanner_t* scanner, byte m)
+{
+	(void) scanner;
+	(void) m;
+	return 0;
+}
+
+void mask_apply(scanner_t* scanner, byte m)
+{
+	size_t s = scanner->s;
+	for (size_t i = 0; i < s; i++)
+		for (size_t j = 0; j < s; j++)
+			if (is_data(scanner, i, j))
+				P(i,j) ^= mask(m, i, j);
+}
+
 byte get_codeword(scanner_t* scanner)
 {
 	byte res = 0;
+	byte m = scanner->m;
 	for (int i = 0; i < 8; i++)
 	{
-		byte bit = P(scanner->i, scanner->j);
+		size_t i = scanner->i;
+		size_t j = scanner->j;
 
 		res *= 2;
-		res += mask(scanner, bit);
+		res += P(i,j) ^ mask(m, i, j);
 		next_bit(scanner);
 	}
 
