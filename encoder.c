@@ -41,7 +41,10 @@ struct stream
 static void push_bit    (stream_t* stream, char bit);
 static void push_bits   (stream_t* stream, size_t n, int v);
 static void push_segment(stream_t* stream, int enc, size_t n, const char* str);
+
 static void encode_in_range(stream_t* stream, const char* data);
+static int  size_to_version(int ecl, size_t n);
+static void add_finder(scanner_t* scanner, size_t i, size_t j);
 
 static void push_bit(stream_t* stream, char bit)
 {
@@ -66,7 +69,6 @@ static void push_bit(stream_t* stream, char bit)
 
 static void push_bits(stream_t* stream, size_t n, int v)
 {
-	printf("Pushing %#x (%zu)\n", v, n);
 	if (!n) return;
 	while (--n)
 		push_bit(stream, v>>n);
@@ -191,8 +193,16 @@ static int size_to_version(int ecl, size_t n)
 	return -1;
 }
 
+static void add_finder(scanner_t* scanner, size_t i, size_t j)
+{
+	for (size_t ki = 0; ki < 7; ki++)
+	for (size_t kj = 0; kj < 7; kj++)
+		P(i+ki, j+kj) = pattern_finder[ki][kj];
+}
+
 void qrc_encode(int ecl, const char* data)
 {
+	// generate bit stream
 	stream_t stream;
 	stream.a = 0;
 	stream.d = NULL;
@@ -213,16 +223,23 @@ void qrc_encode(int ecl, const char* data)
 			break;
 		stream.vr = vr;
 	}
-	printf("Version %i selected\n", v);
+	fprintf(stderr, "Version %i selected\n", v);
 
+	// create image
 	size_t s = 17 + 4*v;
-	byte* d = (byte*) malloc(s*s);
+	byte* d = (byte*) calloc(s*s, sizeof(byte));
 	if (d == NULL)
 	{
 		fprintf(stderr, "Could not allocate image\n");
 		exit(1);
 	}
-
 	scanner_t scanner = {d, s, v, ecl, 0, 0, 0, 0, 0, {0}, 0, 0, 0};
+
+	// finder patterns
+	add_finder(&scanner, 0, 0);
+	add_finder(&scanner, s-7, 0);
+	add_finder(&scanner, 0, s-7);
+
+	// write data to image
 	put_bits(&scanner, stream.n, stream.d);
 }
