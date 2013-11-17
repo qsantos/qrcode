@@ -173,6 +173,19 @@ int mask_grade(scanner_t* scanner, byte m)
 		}
 	}
 
+	// N_2
+	// just adding 3 for each 2x2 block (with overlap)
+	for (size_t i = 0; i < s; i++)
+		for (size_t j = 0; j < s; j++)
+		{
+			byte bit00 = B(i+0,j+0);
+			byte bit01 = B(i+0,j+1);
+			byte bit10 = B(i+1,j+0);
+			byte bit11 = B(i+1,j+1);
+			if (bit00 == bit01 && bit10 == bit11 && bit00 == bit10)
+				score += 3;
+		}
+
 	// N_4
 	// ratio is an integer value between 0 and 20
 	// the middle is 10 and each unit maps to 5%
