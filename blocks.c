@@ -108,7 +108,7 @@ static void get_block(scanner_t* scanner)
 
 
 	// apply Reed-Solomon error correction
-	if (rs_correction(n_data+n_errwords, scanner->block_data, n_errwords) != 0)
+	if (rs_decode(n_data+n_errwords, scanner->block_data, n_errwords) != 0)
 	{
 		fprintf(stderr, "Could not correct errors\n");
 		exit(1);

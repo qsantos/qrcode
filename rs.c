@@ -276,7 +276,7 @@ static void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos)
 	}
 }
 
-byte rs_correction(size_t n_data, byte* data, byte n_sym)
+byte rs_decode(size_t n_data, byte* data, byte n_sym)
 {
 	poly_t msg = { n_data-1, {0} };
 	memcpy(msg.c, data, n_data);
