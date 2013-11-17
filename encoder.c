@@ -46,7 +46,9 @@ static void push_segment(stream_t* stream, int enc, size_t n, const char* str);
 
 static void encode_in_range(stream_t* stream, const char* data);
 static int  size_to_version(int ecl, size_t n);
-static void add_finder(scanner_t* scanner, size_t i, size_t j);
+
+static void set_finder(scanner_t* scanner, size_t i, size_t j);
+static void set_format(scanner_t* scanner, int ecl, byte mask);
 
 static void push_bit(stream_t* stream, char bit)
 {
@@ -195,11 +197,47 @@ static int size_to_version(int ecl, size_t n)
 	return -1;
 }
 
-static void add_finder(scanner_t* scanner, size_t i, size_t j)
+static void set_finder(scanner_t* scanner, size_t i, size_t j)
 {
 	for (size_t ki = 0; ki < 7; ki++)
 	for (size_t kj = 0; kj < 7; kj++)
 		P(i+ki, j+kj) = pattern_finder[ki][kj];
+}
+
+static void set_format(scanner_t* scanner, int ecl, byte mask)
+{
+	bch_t format = (ecl << 3) | mask;
+	format = bch_encode(bch_format_gen, format) ^ bch_format_mask;
+	bch_t copy = format;
+
+	// top-left
+	for (int i = 0; i <= 5; i++)
+	{
+		P(i,8) = format & 1;
+		format >>= 1;
+	}
+	P(7,8) = format & 1; format >>= 1;
+	P(8,8) = format & 1; format >>= 1;
+	P(8,7) = format & 1; format >>= 1;
+	for (int i = 5; i >= 0; i--)
+	{
+		P(8,i) = format & 1;
+		format >>= 1;
+	}
+
+	// bottom-left and top-right
+	format = copy;
+	size_t s = scanner->s;
+	for (int i = 1; i <= 8; i++)
+	{
+		P(8, s-i) = format & 1;
+		format >>= 1;
+	}
+	for (int i = 7; i >= 1; i--)
+	{
+		P(s-i, 8) = format & 1;
+		format >>= 1;
+	}
 }
 
 void qrc_encode(int ecl, const char* data)
@@ -239,9 +277,9 @@ void qrc_encode(int ecl, const char* data)
 	scanner_t* scanner = &_scanner;
 
 	// finder patterns
-	add_finder(scanner, 0, 0);
-	add_finder(scanner, s-7, 0);
-	add_finder(scanner, 0, s-7);
+	set_finder(scanner, 0, 0);
+	set_finder(scanner, s-7, 0);
+	set_finder(scanner, 0, s-7);
 
 	// version information
 	if (v >= 7)
@@ -265,6 +303,7 @@ void qrc_encode(int ecl, const char* data)
 	int  best_s = 0;
 	for (byte m = 0; m < 8; m++)
 	{
+		set_format(scanner, ecl, m);
 		int s = mask_grade(scanner, m);
 		if (s > best_s)
 		{
@@ -275,6 +314,9 @@ void qrc_encode(int ecl, const char* data)
 
 	// apply the best mask
 	mask_apply(scanner, best_m);
+
+	// set format information
+	set_format(scanner, ecl, best_m);
 
 	printf("P1\n%zu %zu\n", s, s);
 	for (size_t i = 0; i < s; i++)
