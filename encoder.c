@@ -24,6 +24,7 @@
 
 #include "data.h"
 #include "blocks.h"
+#include "bch.h"
 
 typedef struct stream stream_t;
 
@@ -233,13 +234,41 @@ void qrc_encode(int ecl, const char* data)
 		fprintf(stderr, "Could not allocate image\n");
 		exit(1);
 	}
-	scanner_t scanner = {d, s, v, ecl, 0, 0, 0, 0, 0, {0}, 0, 0, 0};
+	scanner_t _scanner = {d, s, v, ecl, 0, 0, 0, 0, 0, {0}, 0, 0, 0};
+	scanner_t* scanner = &_scanner;
 
 	// finder patterns
-	add_finder(&scanner, 0, 0);
-	add_finder(&scanner, s-7, 0);
-	add_finder(&scanner, 0, s-7);
+	add_finder(scanner, 0, 0);
+	add_finder(scanner, s-7, 0);
+	add_finder(scanner, 0, s-7);
+
+	// version information
+	if (v >= 7)
+	{
+		bch_t version = bch_encode(bch_version_gen, v) ^ bch_version_mask;
+		for (int i = 0; i <= 5; i++)
+			for (int j = 0; j <= 2; j++)
+			{
+				byte bit = version & 1;
+				P(i, s-11+j) = bit;
+				P(s-11+j, i) = bit;
+				version >>= 1;
+			}
+	}
 
 	// write data to image
-	put_bits(&scanner, stream.n, stream.d);
+	put_bits(scanner, stream.n, stream.d);
+
+	printf("P1\n%zu %zu\n", s, s);
+	for (size_t i = 0; i < s; i++)
+	{
+		for (size_t j = 0; j < s; j++)
+		{
+			if (d[i*s+j])
+				printf("1 ");
+			else
+				printf("0 ");
+		}
+		printf("\n");
+	}
 }
