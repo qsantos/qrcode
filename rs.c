@@ -136,22 +136,22 @@ static byte gf_poly_eval(poly_t* p, byte x)
 	return y;
 }
 
-static void rs_generator_poly(poly_t* g, byte nsym)
+static void rs_generator_poly(poly_t* g, byte n_sym)
 {
 	gf_init();
 	g->d = 0;
 	g->c[0] = 1;
-	for (size_t i = 0; i < nsym; i++)
+	for (size_t i = 0; i < n_sym; i++)
 	{
 		poly_t tmp = { 1, {1, gf_exp[i]} };
 		gf_poly_mul(g, g, &tmp);
 	}
 }
 
-void rs_encode(size_t n_data, byte* data, byte nsym)
+void rs_encode(size_t n_data, byte* data, byte n_sym)
 {
 	poly_t gen;
-	rs_generator_poly(&gen, nsym);
+	rs_generator_poly(&gen, n_sym);
 
 	byte old[512];
 	memcpy(old, data, n_data);
@@ -276,13 +276,13 @@ static void rs_correct_errata(poly_t* msg, poly_t* synd, poly_t* pos)
 	}
 }
 
-byte rs_correction(size_t n_data, byte* data, byte nsym)
+byte rs_correction(size_t n_data, byte* data, byte n_sym)
 {
 	poly_t msg = { n_data-1, {0} };
 	memcpy(msg.c, data, n_data);
 
 	// get syndromes
-	poly_t synd = { nsym, {0} };
+	poly_t synd = { n_sym, {0} };
 	if (rs_calc_syndromes(&msg, &synd) == 0)
 		return 0; // no errors
 
