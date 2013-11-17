@@ -125,7 +125,7 @@ void qrc_decode(scanner_t* scanner)
 	scanner->m = format1 & 0x7; // mask
 	scanner->c = code_to_ecl[format1 >> 3]; // Error Correction Level
 
-	if (scanner->verbosity > 0)
+	if (scanner->verbosity >= 1)
 		printf("Version %zu-%c (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
 
 	// decode data
