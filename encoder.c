@@ -214,7 +214,7 @@ static void set_alignment(scanner_t* scanner, size_t i, size_t j)
 
 static void set_format(scanner_t* scanner, int ecl, byte mask)
 {
-	bch_t format = (ecl << 3) | mask;
+	bch_t format = (ecl_to_code[ecl] << 3) | mask;
 	format = bch_encode(bch_format_gen, format) ^ bch_format_mask;
 	bch_t copy = format;
 
