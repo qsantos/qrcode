@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "pbm.h"
+#include "encoder.h"
 #include "decoder.h"
 
 
@@ -28,14 +29,31 @@
 
 
 
+static char* readfile(FILE* f)
+{
+	size_t n = 0;
+	size_t a = 1;
+	char* ret = malloc(1);
+	while (fread(ret+n, 1, a-n, f) == a-n)
+	{
+		n = a;
+		a *= 2;
+		ret = realloc(ret, a);
+	}
+	return ret;
+}
 static void usage(char* name)
 {
 	fprintf(stderr,
-		"Usage: %s [option] [file]\n"
+		"Usage: %s [option] action [data]\n"
 		"QR-Code decoder\n"
 		"\n"
 		"  -V, --version  display the version of this program\n"
 		"  -h, --help     print this help\n"
+		"\n"
+		"  -e, --encode   encode to QR-code (data is a string)\n"
+		"  -f, --encfile  encode to QR-code (data is a file)\n"
+		"  -d, --decode   decode from QR-code (data is a file)\n"
 		"\n"
 		"  -v  --verbose  increase verbosity\n"
 		, name);
@@ -43,11 +61,12 @@ static void usage(char* name)
 int main(int argc, char** argv)
 {
 	scanner_t scanner;
+	scanner.c = 0;
 	scanner.verbosity = 0;
 
-	FILE* f = stdin;
-
 	int curarg = 1;
+	int action = 0; // 1 = encode string, 2 = encode file, 3 = decode file
+	const char* data = NULL;
 	while (curarg < argc)
 	{
 		const char* arg = argv[curarg++];
@@ -67,19 +86,58 @@ int main(int argc, char** argv)
 		{
 			scanner.verbosity = 1;
 		}
+		else if (strcmp(arg, "--encode") == 0 || strcmp(arg, "-e") == 0)
+		{
+			action = 1;
+		}
+		else if (strcmp(arg, "--encfile") == 0 || strcmp(arg, "-f") == 0)
+		{
+			action = 2;
+		}
+		else if (strcmp(arg, "--decode") == 0 || strcmp(arg, "-d") == 0)
+		{
+			action = 3;
+		}
 		else
 		{
-			f = fopen(arg, "r");
-			if (!f)
-			{
-				fprintf(stderr, "Could not open file '%s'\n", arg);
-				return 1;
-			}
+			data = arg;
+			break;
 		}
 	}
 
-	load_pbm(&scanner, f);
-	qrc_decode(&scanner);
+	if (action == 0)
+	{
+		fprintf(stderr, "No action specified\n");
+		exit(1);
+	}
+	else if (action == 1) // encode
+	{
+		qrc_encode(&scanner, data);
+	}
+	else if (action == 2) // encfile
+	{
+		FILE* f = data ? fopen(data, "r") : stdin;
+		if (!f)
+		{
+			fprintf(stderr, "Could not read file '%s'\n", data);
+			exit(1);
+		}
+		char* str = readfile(f);
+		qrc_encode(&scanner, str);
+		free(str);
+	}
+	else if (action == 3) // decode
+	{
+		FILE* f = data ? fopen(data, "r") : stdin;
+		if (!f)
+		{
+			fprintf(stderr, "Could not open file '%s'\n", data);
+			exit(1);
+		}
+		load_pbm(&scanner, f);
+		qrc_decode(&scanner);
+	}
+
 	free(scanner.d);
 	return 0;
 }
