@@ -114,10 +114,9 @@ void qrc_decode(scanner_t* scanner)
 		exit(1);
 	}
 
-	int format = format1 & format2;
-	scanner->m = format & 0x7; // mask
+	scanner->m = format1 & 0x7; // mask
 	static const byte ECLs[] = { 1, 0, 3, 2 }; // yes, absurd (see Table 25)
-	scanner->c = ECLs[format >> 3]; // Error Correction Level
+	scanner->c = ECLs[format1 >> 3]; // Error Correction Level
 
 	if (scanner->verbosity > 0)
 		printf("Version %zu-%c (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
