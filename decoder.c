@@ -90,7 +90,10 @@ void qrc_decode(scanner_t* scanner)
 		}
 	}
 
-	// format information
+
+	// BEGIN format information
+
+	// top-left
 	bch_t format1 = 0;
 	for (int i = 0; i <= 5; i++)
 		format1 = 2*format1 + P(8,i);
@@ -101,6 +104,7 @@ void qrc_decode(scanner_t* scanner)
 		format1 = 2*format1 + P(i,8);
 	format1 = bch_decode(bch_format_gen, format1 ^ bch_format_mask);
 
+	// bottom-left and top-right
 	bch_t format2 = 0;
 	for (int i = 1; i <= 7; i++)
 		format2 = 2*format2 + P(s-i,8);
@@ -108,11 +112,15 @@ void qrc_decode(scanner_t* scanner)
 		format2 = 2*format2 + P(8,s-i);
 	format2 = bch_decode(bch_format_gen, format2 ^ bch_format_mask);
 
+	// checking validity
 	if ((format1 < 0 && format2 < 0) || format1 != format2)
 	{
 		fprintf(stderr, "Format information corrupted\n");
 		exit(1);
 	}
+
+	// END format information
+
 
 	scanner->m = format1 & 0x7; // mask
 	static const byte ECLs[] = { 1, 0, 3, 2 }; // yes, absurd (see Table 25)
