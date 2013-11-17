@@ -122,6 +122,7 @@ byte mask(byte m, size_t i, size_t j)
 	}
 }
 
+#define B(i,j) P(i,j) ^ (~~is_data(scanner,i,j) & mask(m,i,j))
 int mask_grade(scanner_t* scanner, byte m)
 {
 	// ugly, but fast enough
@@ -137,9 +138,7 @@ int mask_grade(scanner_t* scanner, byte m)
 		size_t n_cons = 0;
 		for (size_t j = 0; j < s; j++)
 		{
-			byte bit = P(i,j);
-			if (is_data(scanner, i, j))
-				bit ^= mask(m, i, j);
+			byte bit = B(i,j);
 
 			if (bit != cur_color)
 			{
@@ -160,9 +159,7 @@ int mask_grade(scanner_t* scanner, byte m)
 		size_t n_cons = 0;
 		for (size_t i = 0; i < s; i++)
 		{
-			byte bit = P(i,j);
-			if (is_data(scanner, i, j))
-				bit ^= mask(m, i, j);
+			byte bit = B(i,j);
 
 			if (bit != cur_color)
 			{
@@ -182,14 +179,8 @@ int mask_grade(scanner_t* scanner, byte m)
 	size_t n_dark = 0;
 	for (size_t i = 0; i < s; i++)
 		for (size_t j = 0; j < s; j++)
-		{
-			byte bit = P(i,j);
-			if (is_data(scanner, i, j))
-				bit ^= mask(m, i, j);
-
-			if (bit)
+			if (B(i,j))
 				n_dark++;
-		}
 	int ratio = (20 * n_dark) / (s*s);
 	int k = ratio - 10;
 	if (k < 0)
