@@ -122,7 +122,14 @@ byte mask(byte m, size_t i, size_t j)
 	}
 }
 
-#define B(i,j) P(i,j) ^ (~~is_data(scanner,i,j) & mask(m,i,j))
+byte mask_if_content(scanner_t* scanner, byte m, size_t i, size_t j)
+{
+	byte bit = P(i,j);
+	if (is_data(scanner, i, j))
+		bit ^= mask(m, i, j);
+	return bit;
+}
+#define B(i,j) mask_if_content(scanner, m, i, j)
 int mask_grade(scanner_t* scanner, byte m)
 {
 	// ugly, but fast enough
