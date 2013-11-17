@@ -186,6 +186,35 @@ int mask_grade(scanner_t* scanner, byte m)
 				score += 3;
 		}
 
+	// N_3
+	// considering what we have done, quadratic time is not that bad
+	for (size_t i = 0; i < s; i++)
+		for (size_t j = 0; j < s-6; j++)
+		{
+			byte bit0 = B(i, j+0);
+			byte bit1 = B(i, j+1);
+			byte bit2 = B(i, j+2);
+			byte bit3 = B(i, j+3);
+			byte bit4 = B(i, j+4);
+			byte bit5 = B(i, j+5);
+			byte bit6 = B(i, j+6);
+			if (bit0 && !bit1 && bit2 && bit3 && bit4 && !bit5 && bit6)
+				score += 40;
+		}
+	for (size_t j = 0; j < s; j++)
+		for (size_t i = 0; i < s-6; i++)
+		{
+			byte bit0 = B(i+0, j);
+			byte bit1 = B(i+1, j);
+			byte bit2 = B(i+2, j);
+			byte bit3 = B(i+3, j);
+			byte bit4 = B(i+4, j);
+			byte bit5 = B(i+5, j);
+			byte bit6 = B(i+6, j);
+			if (bit0 && !bit1 && bit2 && bit3 && bit4 && !bit5 && bit6)
+				score += 40;
+		}
+
 	// N_4
 	// ratio is an integer value between 0 and 20
 	// the middle is 10 and each unit maps to 5%
