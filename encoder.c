@@ -278,8 +278,6 @@ void qrc_encode(scanner_t* scanner, const char* data)
 		stream.vr = vr;
 	}
 	scanner->v = v;
-	if (scanner->verbosity >= 1)
-		fprintf(stderr, "Version %i selected\n", v);
 
 	// compute size
 	size_t s = 17 + 4*v;
@@ -347,6 +345,10 @@ void qrc_encode(scanner_t* scanner, const char* data)
 			best_s = s;
 		}
 	}
+	scanner->m = best_m;
+
+	if (scanner->verbosity >= 1)
+		fprintf(stderr, "Version %i-%c selected (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
 
 	// apply the best mask
 	mask_apply(scanner, best_m);
