@@ -24,6 +24,7 @@
 
 #include "data.h"
 #include "blocks.h"
+#include "modules.h"
 #include "bch.h"
 
 typedef struct stream stream_t;
@@ -258,6 +259,22 @@ void qrc_encode(int ecl, const char* data)
 
 	// write data to image
 	put_bits(scanner, stream.n, stream.d);
+
+	// select a mask
+	byte best_m = 0;
+	int  best_s = 0;
+	for (byte m = 0; m < 8; m++)
+	{
+		int s = mask_grade(scanner, m);
+		if (s > best_s)
+		{
+			best_m = m;
+			best_s = s;
+		}
+	}
+
+	// apply the best mask
+	mask_apply(scanner, best_m);
 
 	printf("P1\n%zu %zu\n", s, s);
 	for (size_t i = 0; i < s; i++)
