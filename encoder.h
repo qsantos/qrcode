@@ -19,6 +19,8 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-void qrc_encode(int ecl, const char* data);
+#include "scanner.h"
+
+void qrc_encode(scanner_t* scanner, const char* data);
 
 #endif

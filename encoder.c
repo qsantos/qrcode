@@ -254,7 +254,7 @@ static void set_format(scanner_t* scanner, int ecl, byte mask)
 	}
 }
 
-void qrc_encode(int ecl, const char* data)
+void qrc_encode(scanner_t* scanner, const char* data)
 {
 	// generate bit stream
 	stream_t stream;
@@ -265,7 +265,7 @@ void qrc_encode(int ecl, const char* data)
 	while (1)
 	{
 		encode_in_range(&stream, data);
-		v = size_to_version(ecl, stream.n);
+		v = size_to_version(scanner->c, stream.n);
 		if (v < 0)
 		{
 			fprintf(stderr, "The data cannot fit in any QR-code\n");
@@ -277,18 +277,22 @@ void qrc_encode(int ecl, const char* data)
 			break;
 		stream.vr = vr;
 	}
-	fprintf(stderr, "Version %i selected\n", v);
+	scanner->v = v;
+	if (scanner->verbosity >= 1)
+		fprintf(stderr, "Version %i selected\n", v);
+
+	// compute size
+	size_t s = 17 + 4*v;
+	scanner->s = s;
 
 	// create image
-	size_t s = 17 + 4*v;
 	byte* d = (byte*) calloc(s*s, sizeof(byte));
 	if (d == NULL)
 	{
 		fprintf(stderr, "Could not allocate image\n");
 		exit(1);
 	}
-	scanner_t _scanner = {d, s, v, ecl, 0, 0, 0, 0, 0, {0}, 0, 0, 0};
-	scanner_t* scanner = &_scanner;
+	scanner->d = d;
 
 	// finder patterns
 	set_finder(scanner, 0, 0);
@@ -335,7 +339,7 @@ void qrc_encode(int ecl, const char* data)
 	int  best_s = 0;
 	for (byte m = 0; m < 8; m++)
 	{
-		set_format(scanner, ecl, m);
+		set_format(scanner, scanner->c, m);
 		int s = mask_grade(scanner, m);
 		if (s > best_s)
 		{
@@ -348,7 +352,7 @@ void qrc_encode(int ecl, const char* data)
 	mask_apply(scanner, best_m);
 
 	// set format information
-	set_format(scanner, ecl, best_m);
+	set_format(scanner, scanner->c, best_m);
 
 	printf("P1\n%zu %zu\n", s, s);
 	for (size_t i = 0; i < s; i++)
