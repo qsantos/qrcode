@@ -66,16 +66,15 @@ void qrc_decode(scanner_t* scanner)
 	scanner->v = v;
 	if (v >= 7)
 	{
-		int version1 = 0;
+		bch_t version1 = 0;
+		bch_t version2 = 0;
 		for (int i = 5; i >= 0; i--)
 			for (int j = 2; j >= 0; j--)
+			{
 				version1 = 2*version1 + P(i, s-11+j);
+				version2 = 2*version2 + P(s-11+j, i);
+			}
 		version1 = bch_decode(bch_version_gen, version1 ^ bch_version_mask);
-
-		int version2 = 0;
-		for (int i = 5; i >= 0; i--)
-			for (int j = 2; j >= 0; j--)
-				version2 = 2*version2 + P(i, s-11+j);
 		version2 = bch_decode(bch_version_gen, version2 ^ bch_version_mask);
 
 		if ((version1 < 0 && version2 < 0) || version1 != version2)
@@ -84,7 +83,7 @@ void qrc_decode(scanner_t* scanner)
 			exit(1);
 		}
 
-		if (version1 != (int) v)
+		if (version1 != (bch_t) v)
 		{
 			fprintf(stderr, "Version information mismatches size\n");
 			exit(1);
