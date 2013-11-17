@@ -124,9 +124,79 @@ byte mask(byte m, size_t i, size_t j)
 
 int mask_grade(scanner_t* scanner, byte m)
 {
-	(void) scanner;
-	(void) m;
-	return 0;
+	// ugly, but fast enough
+
+	size_t s = scanner->s;
+	int score = 0;
+
+	// N_1
+	// rows
+	for (size_t i = 0; i < s; i++)
+	{
+		byte cur_color = 0;
+		size_t n_cons = 0;
+		for (size_t j = 0; j < s; j++)
+		{
+			byte bit = P(i,j);
+			if (is_data(scanner, i, j))
+				bit ^= mask(m, i, j);
+
+			if (bit != cur_color)
+			{
+				n_cons = 0;
+				cur_color = bit;
+			}
+			else if (n_cons == 5)
+				score += 3;
+			else if (n_cons > 5)
+				score++;
+			n_cons++;
+		}
+	}
+	// columns
+	for (size_t j = 0; j < s; j++)
+	{
+		byte cur_color = 0;
+		size_t n_cons = 0;
+		for (size_t i = 0; i < s; i++)
+		{
+			byte bit = P(i,j);
+			if (is_data(scanner, i, j))
+				bit ^= mask(m, i, j);
+
+			if (bit != cur_color)
+			{
+				n_cons = 0;
+				cur_color = bit;
+			}
+			else if (n_cons == 5)
+				score += 3;
+			else if (n_cons > 5)
+			n_cons++;
+		}
+	}
+
+	// N_4
+	// ratio is an integer value between 0 and 20
+	// the middle is 10 and each unit maps to 5%
+	size_t n_dark = 0;
+	for (size_t i = 0; i < s; i++)
+		for (size_t j = 0; j < s; j++)
+		{
+			byte bit = P(i,j);
+			if (is_data(scanner, i, j))
+				bit ^= mask(m, i, j);
+
+			if (bit)
+				n_dark++;
+		}
+	int ratio = (20 * n_dark) / (s*s);
+	int k = ratio - 10;
+	if (k < 0)
+		k = -k;
+	score += 10 * k;
+
+	return score;
 }
 
 void mask_apply(scanner_t* scanner, byte m)

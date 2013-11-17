@@ -334,12 +334,12 @@ void qrc_encode(scanner_t* scanner, const char* data)
 
 	// select a mask
 	byte best_m = 0;
-	int  best_s = 0;
+	int  best_s = -1;
 	for (byte m = 0; m < 8; m++)
 	{
 		set_format(scanner, scanner->c, m);
 		int s = mask_grade(scanner, m);
-		if (s > best_s)
+		if (best_s == -1 || s < best_s)
 		{
 			best_m = m;
 			best_s = s;
