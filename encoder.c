@@ -47,8 +47,9 @@ static void push_segment(stream_t* stream, int enc, size_t n, const char* str);
 static void encode_in_range(stream_t* stream, const char* data);
 static int  size_to_version(int ecl, size_t n);
 
-static void set_finder(scanner_t* scanner, size_t i, size_t j);
-static void set_format(scanner_t* scanner, int ecl, byte mask);
+static void set_finder   (scanner_t* scanner, size_t i, size_t j);
+static void set_alignment(scanner_t* scanner, size_t i, size_t j);
+static void set_format   (scanner_t* scanner, int ecl, byte mask);
 
 static void push_bit(stream_t* stream, char bit)
 {
@@ -204,6 +205,13 @@ static void set_finder(scanner_t* scanner, size_t i, size_t j)
 		P(i+ki, j+kj) = pattern_finder[ki][kj];
 }
 
+static void set_alignment(scanner_t* scanner, size_t i, size_t j)
+{
+	for (size_t ki = 0; ki < 5; ki++)
+	for (size_t kj = 0; kj < 5; kj++)
+		P(i+ki-2, j+kj-2) = pattern_alignment[ki][kj];
+}
+
 static void set_format(scanner_t* scanner, int ecl, byte mask)
 {
 	bch_t format = (ecl << 3) | mask;
@@ -280,6 +288,17 @@ void qrc_encode(int ecl, const char* data)
 	set_finder(scanner, 0, 0);
 	set_finder(scanner, s-7, 0);
 	set_finder(scanner, 0, s-7);
+
+	// alignment patterns
+	const byte* xy = pattern_alignment_pos[v];
+	for (const byte* a = xy; *a; a++)
+		for (const byte* b = xy; *b; b++)
+		{
+			if (*a < 8 && *b < 8) continue; 
+			if (*a < 8 && *b > s-9) continue;
+			if (*b < 8 && *a > s-9) continue;
+			set_alignment(scanner, *a, *b);
+		}
 
 	// version information
 	if (v >= 7)

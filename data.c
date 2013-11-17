@@ -27,6 +27,15 @@ const unsigned char pattern_finder[7][7] =
 	{ 1,1,1,1,1,1,1, },
 };
 
+const unsigned char pattern_alignment[5][5] = 
+{
+	{ 1,1,1,1,1, },
+	{ 1,0,0,0,1, },
+	{ 1,0,1,0,1, },
+	{ 1,0,0,0,1, },
+	{ 1,1,1,1,1, },
+};
+
 const char* charset_alpha = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
 const unsigned char version_range[41] =

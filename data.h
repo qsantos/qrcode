@@ -20,8 +20,12 @@
 #define DATA_H
 
 // 7 by 7 matrix representing the
-// pattern finder found in each corner
+// finder pattern found in each corner
 extern const unsigned char pattern_finder[7][7];
+
+// 5 by 5 matrix representing the
+// alignment pattern
+extern const unsigned char pattern_alignment[5][5];
 
 // 45-byte long character set for
 // the alphanumeric encoding mode
