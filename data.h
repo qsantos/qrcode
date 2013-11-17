@@ -39,6 +39,12 @@ extern const unsigned long bch_format_mask;
 extern const unsigned long bch_version_gen;
 extern const unsigned long bch_version_mask;
 
+// position of alignment patterns for each version
+// the v-th row contains the list of coordinates
+// the positions are all combinations of this coordinates
+// except for the three corner (finder pattern overlaps)
+extern const unsigned char pattern_alignment_pos[41][8];
+
 // row 4*v+c gives six numbers A,B,C,D,E,F
 // v = version
 // c = error correction level

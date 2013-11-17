@@ -18,15 +18,17 @@
 
 #include "modules.h"
 
+#include "data.h"
+
 
 
 // please, refer to DOCUMENTATION for technical details
 
 
 
-static int  is_data(scanner_t* scanner, size_t i, size_t j);
+static int is_data(scanner_t* scanner, byte i, byte j);
 
-static int is_data(scanner_t* scanner, size_t i, size_t j)
+static int is_data(scanner_t* scanner, byte i, byte j)
 {
 	size_t s = scanner->s;
 
@@ -49,55 +51,11 @@ static int is_data(scanner_t* scanner, size_t i, size_t j)
 	// alignments
 	if (i <= 8 && j >= s-10) return 1;
 	if (j <= 8 && i >= s-10) return 1;
-	static const size_t aligns[][8] =
-	{
-		{ 0, },
-		{ 0, },
-		{ 6,18,0 },
-		{ 6,22,0 },
-		{ 6,26,0 },
-		{ 6,30,0 },
-		{ 6,34,0 },
-		{ 6,22,38,0 },
-		{ 6,24,42,0 },
-		{ 6,26,46,0 },
-		{ 6,28,50,0 },
-		{ 6,30,54,0 },
-		{ 6,32,58,0 },
-		{ 6,34,62,0 },
-		{ 6,26,46,66,0 },
-		{ 6,26,48,70,0 },
-		{ 6,26,50,74,0 },
-		{ 6,30,54,78,0 },
-		{ 6,30,56,82,0 },
-		{ 6,30,58,86,0 },
-		{ 6,34,82,90,0 },
-		{ 6,28,50,72, 94,0 },
-		{ 6,26,50,74, 98,0 },
-		{ 6,30,54,78,102,0 },
-		{ 6,28,54,80,106,0 },
-		{ 6,32,58,84,110,0 },
-		{ 6,30,58,86,114,0 },
-		{ 6,34,62,90,118,0 },
-		{ 6,26,50,74, 98,122,0 },
-		{ 6,30,54,78,102,126,0 },
-		{ 6,26,52,78,104,130,0 },
-		{ 6,30,56,82,108,134,0 },
-		{ 6,34,60,86,112,138,0 },
-		{ 6,30,58,86,114,142,0 },
-		{ 6,34,62,90,118,146,0 },
-		{ 6,30,54,78,102,126,150,0 },
-		{ 6,24,50,76,102,128,154,0 },
-		{ 6,28,54,80,106,132,158,0 },
-		{ 6,32,58,84,110,136,162,0 },
-		{ 6,26,54,82,110,138,166,0 },
-		{ 6,30,58,86,114,142,170,0 },
-	};
 	int coll_x = 0;
-	for (const size_t* a = aligns[scanner->v]; *a && !coll_x; a++)
+	for (const byte* a = pattern_alignment_pos[scanner->v]; *a && !coll_x; a++)
 		coll_x = (*a-2 <= i && i <= *a+2);
 	int coll_y = 0;
-	for (const size_t* a = aligns[scanner->v]; *a && !coll_y; a++)
+	for (const byte* a = pattern_alignment_pos[scanner->v]; *a && !coll_y; a++)
 		coll_y = (*a-2 <= j && j <= *a+2);
 
 	return !(coll_x && coll_y);
