@@ -224,18 +224,28 @@ static void put_block(scanner_t* scanner)
 
 void put_bits(scanner_t* scanner, size_t n, const char* stream)
 {
-	size_t cur = 0;
 	const byte* b = block_sizes[4*scanner->v + scanner->c];
+	size_t cur = 0;
 	size_t n_data = cur < b[0] ? b[2] : b[5];
-	while (n >= n_data)
+	while (cur < b[0] + b[3])
 	{
 		scanner->block_cur = cur;
 		scanner->block_dataw = n_data;
-		memcpy(scanner->block_data, stream, n_data);
+		if (n)
+			memcpy(scanner->block_data, stream, n);
+		if (n < n_data)
+		{
+			for (size_t i = 0; i < n_data-n; i++)
+				scanner->block_data[n+i] = i % 2 ? 0x11 : 0xec;
+			n = 0;
+		}
 		put_block(scanner);
 
-		n -= n_data;
-		stream += n_data;
+		if (n)
+		{
+			n -= n_data;
+			stream += n_data;
+		}
 		cur++;
 		n_data = cur < b[0] ? b[2] : b[5];
 	}
