@@ -187,7 +187,7 @@ static void encode_in_range(stream_t* stream, const char* data)
 		n_byte++;
 	}
 	PUSH(4, n_byte);
-	PUSH(2, n_ascii);
+	PUSH(2, n_alpha);
 	PUSH(1, n_numer);
 	push_bits(stream, 4, 0);
 	push_bits(stream, 0, stream->b);
