@@ -120,7 +120,7 @@ static void push_segment(stream_t* stream, int enc, size_t n, const char* str)
 		if (n == 1)
 		{
 			unsigned int c = A(0);
-			push_bits(stream, 5, c);
+			push_bits(stream, 6, c);
 		}
 	}
 	else if (enc == 4)
@@ -186,7 +186,9 @@ static void encode_in_range(stream_t* stream, const char* data)
 		}
 		n_byte++;
 	}
-	PUSH(4, n_byte)
+	PUSH(4, n_byte);
+	PUSH(2, n_ascii);
+	PUSH(1, n_numer);
 	push_bits(stream, 4, 0);
 	push_bits(stream, 0, stream->b);
 	stream->n++;
