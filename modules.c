@@ -182,8 +182,8 @@ int mask_grade(scanner_t* scanner, byte m)
 
 	// N_2
 	// just adding 3 for each 2x2 block (with overlap)
-	for (size_t i = 0; i < s; i++)
-		for (size_t j = 0; j < s; j++)
+	for (size_t i = 0; i < s-1; i++)
+		for (size_t j = 0; j < s-1; j++)
 		{
 			byte bit00 = B(i+0,j+0);
 			byte bit01 = B(i+0,j+1);
