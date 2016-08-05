@@ -120,7 +120,7 @@ static void push_segment(stream_t* stream, int enc, size_t n, const char* str)
 		if (n == 1)
 		{
 			unsigned int c = A(0);
-			push_bits(stream, 5, c);
+			push_bits(stream, 6, c);
 		}
 	}
 	else if (enc == 4)
@@ -186,7 +186,32 @@ static void encode_in_range(stream_t* stream, const char* data)
 		}
 		n_byte++;
 	}
-	PUSH(4, n_byte)
+
+	// handle remaining data
+	if (n_byte)
+	{
+		// there is something left
+		if (n_alpha == n_byte)
+		{
+			// it's all alphanumeric
+			if (n_numer == n_alpha)
+			{
+				// it's all numeric
+				PUSH(1, n_numer);
+			}
+			else
+			{
+				// actually alphanumeric
+				PUSH(2, n_alpha);
+			}
+		}
+		else
+		{
+			// 8-bit data
+			PUSH(4, n_byte);
+		}
+	}
+
 	push_bits(stream, 4, 0);
 	push_bits(stream, 0, stream->b);
 	stream->n++;
