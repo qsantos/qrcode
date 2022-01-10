@@ -221,9 +221,11 @@ static int size_to_version(int ecl, size_t n)
 {
 	for (size_t v = 1; v <= 40; v++)
 	{
-		const byte* b = block_sizes[4*v+ecl];
-		size_t c = b[0]*b[2] + b[3]*b[5];
-		if (n <= c)
+		struct TwoBlockRuns runs = block_sizes[4 * v + ecl];
+        size_t first_run_data_codewords = runs.first.n_blocks * runs.first.data_codewords_per_block;
+        size_t second_run_data_codewords = runs.second.n_blocks * runs.second.data_codewords_per_block;
+		size_t total_data_codewords = first_run_data_codewords + second_run_data_codewords;
+		if (n <= total_data_codewords)
 			return v;
 	}
 	return -1;

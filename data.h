@@ -55,15 +55,18 @@ extern const unsigned long bch_version_mask;
 // except for the three corner (finder pattern overlaps)
 extern const unsigned char pattern_alignment_pos[41][8];
 
-// row 4*v+c gives six numbers A,B,C,D,E,F
-// v = version
-// c = error correction level
-// A = number of blocks of the first kind
-// B = number of codewords in each of these blocks
-// C = number of data codewords in each of these blocks
-// D = number of blocks of the second kind
-// E = number of codewords in each of these blocks
-// F = number of data codewords in each of these blocks
-extern const unsigned char block_sizes[164][6];
+struct BlockRun {
+    unsigned int n_blocks;
+    unsigned int total_codewords_per_block;
+    unsigned int data_codewords_per_block;
+};
+
+struct TwoBlockRuns {
+    struct BlockRun first;
+    struct BlockRun second;
+};
+
+// row at index (4 * version + error_correction_level) describes the two runs of blocks
+extern const struct TwoBlockRuns block_sizes[164];
 
 #endif
