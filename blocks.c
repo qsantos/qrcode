@@ -227,32 +227,29 @@ static void put_block(scanner_t* scanner)
 void put_bits(scanner_t* scanner, size_t n, const char* stream)
 {
 	struct TwoBlockRuns runs = block_sizes[4 * scanner->v + scanner->c];
-	size_t cur = 0;
-	size_t codewords_per_block = cur < runs.first.n_blocks ? runs.first.data_codewords_per_block : runs.second.data_codewords_per_block;
+	size_t cur_block = 0;
+	size_t codewords_per_block = runs.first.data_codewords_per_block;
 	size_t n_blocks = runs.first.n_blocks + runs.second.n_blocks;
-	while (cur < n_blocks)
+	while (cur_block < n_blocks)
 	{
-		scanner->block_cur = cur;
+		scanner->block_cur = cur_block;
 		scanner->block_dataw = codewords_per_block;
-		if (n)
-			memcpy(scanner->block_data, stream, n);
+
+		size_t data_to_copy_in_block = n < codewords_per_block ? n : codewords_per_block;
+		if (data_to_copy_in_block > 0)
+		{
+			memcpy(scanner->block_data, stream, data_to_copy_in_block);
+			n -= data_to_copy_in_block;
+		}
 
 		// padding
-		if (n < codewords_per_block)
-		{
-			for (size_t i = 0; i < codewords_per_block - n; i++)
-				scanner->block_data[n + i] = i % 2 ? 0x11 : 0xec;
-			n = 0;
-		}
+		for (size_t i = data_to_copy_in_block; i < codewords_per_block; i++)
+			scanner->block_data[i] = (i - n) % 2 ? 0x11 : 0xec;
 
 		put_block(scanner);
 
-		if (n)
-		{
-			n -= codewords_per_block;
-			stream += codewords_per_block;
-		}
-		cur++;
-		codewords_per_block = cur < runs.first.n_blocks ? runs.first.data_codewords_per_block : runs.second.data_codewords_per_block;
+		stream += codewords_per_block;
+		cur_block++;
+		codewords_per_block = cur_block < runs.first.n_blocks ? runs.first.data_codewords_per_block : runs.second.data_codewords_per_block;
 	}
 }
