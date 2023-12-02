@@ -37,7 +37,7 @@ static byte max(byte a, byte b);
 // Galois Field operations
 //
 // init discrete logarithm lookup table
-static void gf_init();
+static void gf_init(void);
 // element-wise operations
 static byte gf_mul(byte x, byte y);
 static byte gf_div(byte x, byte y);
@@ -69,7 +69,7 @@ static byte max(byte a, byte b)
 	return a >= b ? a : b;
 }
 
-static void gf_init()
+static void gf_init(void)
 {
 	static char done = 0;
 	if (done) return;

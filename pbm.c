@@ -81,7 +81,12 @@ static byte nextbit(FILE* f, byte* buf, size_t* buf_avail)
 {
 	if (!*buf_avail)
 	{
-		fread(buf, 1, 1, f);
+		if (fread(buf, 1, 1, f) != 1)
+		{
+			fprintf(stderr, "Unexpected %s\n",
+				feof(f) ? "end of file" : "error reading file");
+			exit(1);
+		}
 		*buf_avail = 8;
 	}
 	return (*buf >> (--(*buf_avail))) & 1;
