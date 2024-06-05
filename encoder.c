@@ -283,6 +283,8 @@ static void set_format(scanner_t* scanner, int ecl, byte mask)
 
 void qrc_encode(scanner_t* scanner, const char* data)
 {
+	char *black_block_char = scanner->use_netpbm ? "1 " : "██";
+	char *white_block_char = scanner->use_netpbm ? "0 " : "  ";
 	// generate bit stream
 	stream_t stream;
 	stream.a = 0;
@@ -383,15 +385,18 @@ void qrc_encode(scanner_t* scanner, const char* data)
 	// set format information
 	set_format(scanner, scanner->c, best_m);
 
-	printf("P1\n%zu %zu\n", s, s);
+	if (scanner->use_netpbm) {
+		printf("P1\n%zu %zu\n", s, s);
+	}
+
 	for (size_t i = 0; i < s; i++)
 	{
 		for (size_t j = 0; j < s; j++)
 		{
 			if (d[i*s+j])
-				printf("1 ");
+				printf("%s", black_block_char);
 			else
-				printf("0 ");
+				printf("%s", white_block_char);
 		}
 		printf("\n");
 	}

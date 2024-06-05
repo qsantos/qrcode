@@ -49,6 +49,7 @@ struct scanner
 
 	// options
 	char verbosity; // verbosity level
+	char use_netpbm; // use netpbm or ascii characters
 };
 
 #endif

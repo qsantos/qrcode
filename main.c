@@ -48,12 +48,13 @@ static void usage(char* name)
 		"Usage: %s [option] action [data]\n"
 		"QR-Code decoder\n"
 		"\n"
-		"  -V, --version  display the version of this program\n"
-		"  -h, --help     print this help\n"
+		"  -V, --version       display the version of this program\n"
+		"  -h, --help          print this help\n"
 		"\n"
-		"  -e, --encode   encode to QR-code (data is a string)\n"
-		"  -f, --encfile  encode to QR-code (data is a file)\n"
-		"  -d, --decode   decode from QR-code (data is a file)\n"
+		"  -e, --encode        encode to QR-code (data is a string)\n"
+		"  -f, --encfile       encode to QR-code (data is a file)\n"
+		"  -d, --decode        decode from QR-code (data is a file)\n"
+		"  -n, --use-netpbm    use the netpbm representation instead of ascii characters\n"
 		"\n"
 		"  -v  --verbose  increase verbosity\n"
 		, name);
@@ -63,6 +64,7 @@ int main(int argc, char** argv)
 	scanner_t scanner;
 	scanner.c = 0;
 	scanner.verbosity = 0;
+	scanner.use_netpbm = 0;
 
 	int curarg = 1;
 	int action = 0; // 1 = encode string, 2 = encode file, 3 = decode file
@@ -85,6 +87,10 @@ int main(int argc, char** argv)
 		else if (strcmp(arg, "--verbose") == 0 || strcmp(arg, "-v") == 0)
 		{
 			scanner.verbosity = 1;
+		}
+		else if (strcmp(arg, "--use-netpbm") == 0 || strcmp(arg, "-n") == 0)
+		{
+			scanner.use_netpbm = 1;
 		}
 		else if (strcmp(arg, "--encode") == 0 || strcmp(arg, "-e") == 0)
 		{
