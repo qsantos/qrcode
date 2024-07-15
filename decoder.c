@@ -126,7 +126,7 @@ void qrc_decode(scanner_t* scanner)
 	scanner->c = code_to_ecl[format1 >> 3]; // Error Correction Level
 
 	if (scanner->verbosity >= 1)
-		printf("Version %zu-%c (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
+		printf("Version %zu-%c (mask %d)\n", v, "LMQH"[scanner->c], scanner->m);
 
 	// decode data
 	scanner->block_cur = 0;

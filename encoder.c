@@ -377,7 +377,7 @@ void qrc_encode(scanner_t* scanner, const char* data)
 	scanner->m = best_m;
 
 	if (scanner->verbosity >= 1)
-		fprintf(stderr, "Version %i-%c selected (mask %u)\n", v, "LMQH"[scanner->c], scanner->m);
+		fprintf(stderr, "Version %i-%c selected (mask %d)\n", v, "LMQH"[scanner->c], scanner->m);
 
 	// apply the best mask
 	mask_apply(scanner, best_m);
