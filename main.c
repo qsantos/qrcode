@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -34,11 +35,13 @@ static char* readfile(FILE* f)
 	size_t n = 0;
 	size_t a = 1;
 	char* ret = malloc(1);
+	assert(ret != NULL);
 	while (fread(ret+n, 1, a-n, f) == a-n)
 	{
 		n = a;
 		a *= 2;
 		ret = realloc(ret, a);
+		assert(ret != NULL);
 	}
 	return ret;
 }
