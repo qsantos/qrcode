@@ -61,10 +61,7 @@ static void usage(char* name)
 }
 int main(int argc, char** argv)
 {
-	scanner_t scanner;
-	scanner.c = 0;
-	scanner.verbosity = 0;
-	scanner.use_netpbm = 0;
+	scanner_t scanner = { 0 };
 
 	int curarg = 1;
 	int action = 0; // 1 = encode string, 2 = encode file, 3 = decode file
