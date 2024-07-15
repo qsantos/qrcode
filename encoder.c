@@ -367,11 +367,11 @@ void qrc_encode(scanner_t* scanner, const char* data)
 	for (byte m = 0; m < 8; m++)
 	{
 		set_format(scanner, scanner->c, m);
-		int s = mask_grade(scanner, m);
-		if (best_s == -1 || s < best_s)
+		int local_s = mask_grade(scanner, m);
+		if (best_s == -1 || local_s < best_s)
 		{
 			best_m = m;
-			best_s = s;
+			best_s = local_s;
 		}
 	}
 	scanner->m = best_m;
