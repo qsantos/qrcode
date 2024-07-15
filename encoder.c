@@ -212,6 +212,9 @@ static void encode_in_range(stream_t* stream, const char* data)
 		}
 	}
 
+	// Ignore PUSH incrementing data pointer event if it is not used afterwards
+	(void) data;
+
 	push_bits(stream, 4, 0);
 	push_bits(stream, 0, stream->b);
 	stream->n++;
