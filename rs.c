@@ -183,8 +183,8 @@ static void rs_forney_syndromes(poly_t* msg, poly_t* synd, poly_t* pos, poly_t* 
 	for (size_t i = 0; i < pos->d; i++)
 	{
 		byte x = gf_exp[msg->d - pos->c[i]];
-		for (size_t i = 0; i < fsynd->d; i++)
-			fsynd->c[i] = gf_mul(fsynd->c[i], x) ^ fsynd->c[i+1];
+		for (size_t j = 0; j < fsynd->d; j++)
+			fsynd->c[j] = gf_mul(fsynd->c[j], x) ^ fsynd->c[j+1];
 		fsynd->d--;
 	}
 }
