@@ -40,6 +40,8 @@ static char* readfile(FILE* f)
 	{
 		n = a;
 		a *= 2;
+		// Not a memory leak is realloc fail since we just terminate
+		// cppcheck-suppress memleakOnRealloc
 		ret = realloc(ret, a);
 		assert(ret != NULL);
 	}
