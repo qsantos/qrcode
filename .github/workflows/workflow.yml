@@ -15,6 +15,6 @@ jobs:
       - name: Run cppcheck
         run: cppcheck --enable=all --inline-suppr --suppress=missingIncludeSystem --force *.c
       - name: Build
-        run: make
+        run: CFLAGS=-Werror make
       - name: Test
         run: test "$(./qrcode -n -e 'Hello, World!' | ./qrcode -d)" = 'Hello, World!'
