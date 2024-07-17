@@ -1,18 +1,11 @@
-CC      = gcc
-CFLAGS  = -Wall -Wextra -Werror -Wpedantic -std=c99 -O3
-LDFLAGS = -O3
-TARGETS = qrcode
+CC := gcc
+CFLAGS := -Wall -Wextra -Werror -Wpedantic -std=c99 -O3
+LDFLAGS := -O3
 
-$(TARGETS): main.o pbm.o encoder.o decoder.o rs.o bch.o blocks.o modules.o data.o
-	$(CC) $(LDFLAGS) $^ -o $@
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+qrcode: main.o pbm.o encoder.o decoder.o rs.o bch.o blocks.o modules.o data.o
 
 clean:
 	rm -f *.o
 
 destroy: clean
-	rm -f $(TARGETS)
-
-rebuild: destroy $(TARGETS)
+	rm -f qrcode
