@@ -120,6 +120,11 @@ int main(int argc, char** argv)
 	}
 	else if (action == 1) // encode
 	{
+		if (data == NULL) {
+			fprintf(stderr, "--encode requires data to be passed as an argument\n");
+			usage(argv[0]);
+			exit(1);
+		}
 		qrc_encode(&scanner, data);
 	}
 	else if (action == 2) // encfile
