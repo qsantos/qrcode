@@ -286,8 +286,8 @@ static void set_format(scanner_t* scanner, int ecl, byte mask)
 
 void qrc_encode(scanner_t* scanner, const char* data)
 {
-	char *black_block_char = scanner->use_netpbm ? "1 " : "██";
-	char *white_block_char = scanner->use_netpbm ? "0 " : "  ";
+	char *black_block_char = scanner->use_netpbm ? "1 " : "  ";
+	char *white_block_char = scanner->use_netpbm ? "0 " : "██";
 	// generate bit stream
 	stream_t stream;
 	stream.a = 0;
